@@ -7,7 +7,7 @@ using TestEnv.Tester;
 using TestEnv.Tools;
 
 Console.WriteLine("Hello, World!");
-var testEpic = "PGR";
+var testEpic = "NDAQ";
 
 var restApi = new APIProcessor();
 var testData = GetTestingData();
@@ -15,7 +15,7 @@ var apiEmulator = new APIEmulator(testData);
 //var res = restApi.GetMarkets("US Wall Street 30");
 var logger = new ExcelLogger();
 var monitor = new MonitoringManager(apiEmulator, logger);
-for (int i = 15; i < testData.Prices.Count(); i++)
+for (int i = 20; i < testData.Prices.Count()-1; i++)
     monitor.CheckRegularData();
 logger.SaveExcel();
 Console.WriteLine($"Start balance: 1000, end balance: {apiEmulator.GetBalance()}");

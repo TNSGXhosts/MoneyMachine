@@ -18,6 +18,7 @@ namespace MoneyMachine.Constants
         public const string Balance = "Balance";
         public const string SellSignal = "Sell signal";
         public const string BuySignal = "Buy Signal";
+        public const string Date = "Date";
         public const string ProductPriceChanging = "Product Price Changing";
         public const string BalanceChanging = "Balance Changing";
     }

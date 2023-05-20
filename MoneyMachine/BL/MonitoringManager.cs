@@ -143,9 +143,9 @@ namespace MoneyMachine.BL
 			{
 				var update = new Ohlc()
 				{
-					High = data.Prices.LastOrDefault().HighPrice.Ask,
-					Low = data.Prices.LastOrDefault().LowPrice.Ask,
-					Close = data.Prices.LastOrDefault().ClosePrice.Ask,
+					High = data.Prices.LastOrDefault().HighPrice.Bid,
+					Low = data.Prices.LastOrDefault().LowPrice.Bid,
+					Close = data.Prices.LastOrDefault().ClosePrice.Bid,
 					Date = DateTime.Parse(data.Prices.LastOrDefault().SnapshotTime)
 				};
 
@@ -159,7 +159,6 @@ namespace MoneyMachine.BL
 					//Sell signal
 					Logger.LogSignal(false, update.Close);
 					restApiClient.ClosePosition(openPosition.Position.DealId);
-					_balance = restApiClient.GetBalance();
 					openPosition = null;
 				}
 				if (CheckBuySignal(update.Close))
@@ -174,10 +173,10 @@ namespace MoneyMachine.BL
 					};
 					restApiClient.CreatePosition(position);
 					openPosition = restApiClient.GetAllPositions().FirstOrDefault();
-					_balance = restApiClient.GetBalance();
 				}
+                _balance = restApiClient.GetBalance();
 
-                Logger.LogCurrentData(_bollingerBandSerie.UpperBand.LastOrDefault().Value, _bollingerBandSerie.LowerBand.LastOrDefault().Value, _rsiSerie.RSI.LastOrDefault().Value, update.Close, _balance);
+                Logger.LogCurrentData(_bollingerBandSerie.UpperBand.LastOrDefault().Value, _bollingerBandSerie.LowerBand.LastOrDefault().Value, _rsiSerie.RSI.LastOrDefault().Value, update.Close, _balance, update.Date);
             }
         }
 

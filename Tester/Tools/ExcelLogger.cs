@@ -29,8 +29,9 @@ namespace TestEnv.Tools
             MainSheet.Cells[$"E{Index}"].PutValue(Fields.RSI);
             MainSheet.Cells[$"F{Index}"].PutValue(Fields.SellSignal);
             MainSheet.Cells[$"G{Index}"].PutValue(Fields.BuySignal);
-            MainSheet.Cells[$"I{Index}"].Value = Fields.ProductPriceChanging;
-            MainSheet.Cells[$"J{Index}"].Value = Fields.BalanceChanging;
+            MainSheet.Cells[$"I{Index}"].PutValue(Fields.Date);
+            MainSheet.Cells[$"J{Index}"].Value = Fields.ProductPriceChanging;
+            MainSheet.Cells[$"K{Index}"].Value = Fields.BalanceChanging;
             Index = ++Index;
         }
 
@@ -41,25 +42,26 @@ namespace TestEnv.Tools
 
         public void SaveExcel()
         {
-            int chartIndex = MainSheet.Charts.Add(Aspose.Cells.Charts.ChartType.Line, 1, 10, 50, 30);
+            int chartIndex = MainSheet.Charts.Add(Aspose.Cells.Charts.ChartType.Line, 1, 11, 50, 31);
             // Accessing the instance of the newly added chart
             Aspose.Cells.Charts.Chart chart = MainSheet.Charts[chartIndex];
             // Setting chart data source as the range  "A1:C4"
-            chart.SetChartDataRange($"I2:J{Index}", true);
+            chart.SetChartDataRange($"J2:K{Index}", true);
 
             // Save the Excel file.
             Workbook.Save(Path.Join(DataPath, "DataSet.xlsx"));
         }
 
-        public void LogCurrentData(double BBUpper, double BBLower, double rsi, double bid, double balance)
+        public void LogCurrentData(double BBUpper, double BBLower, double rsi, double bid, double balance, DateTime date)
         {
             MainSheet.Cells[$"A{Index}"].Value = bid;
             MainSheet.Cells[$"B{Index}"].Value = balance;
             MainSheet.Cells[$"C{Index}"].PutValue(BBLower);
             MainSheet.Cells[$"D{Index}"].PutValue(BBUpper);
             MainSheet.Cells[$"E{Index}"].PutValue(rsi);
-            MainSheet.Cells[$"I{Index}"].Value = bid / (Convert.ToDouble(MainSheet.Cells[$"A{17}"].Value) / 100);
-            MainSheet.Cells[$"J{Index}"].Value = balance / (Convert.ToDouble(MainSheet.Cells[$"B{2}"].Value) / 100);
+            MainSheet.Cells[$"I{Index}"].PutValue(date.ToString());
+            MainSheet.Cells[$"J{Index}"].Value = bid / (Convert.ToDouble(MainSheet.Cells[$"A{17}"].Value) / 100);
+            MainSheet.Cells[$"K{Index}"].Value = balance / (Convert.ToDouble(MainSheet.Cells[$"B{2}"].Value) / 100);
             Index = ++Index;
         }
 

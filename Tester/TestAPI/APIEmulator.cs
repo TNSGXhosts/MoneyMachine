@@ -18,7 +18,7 @@ namespace TestEnv.TestAPI
 		{
             PricesEntity = pricesEntity;
             Positions = new List<OpenPosition>();
-            Index = -1;
+            Index = 0;
             Balance = 1000;
 		}
 
@@ -28,7 +28,7 @@ namespace TestEnv.TestAPI
             if (closingPosition != null)
             {
                 Positions.Remove(closingPosition);
-                Balance += closingPosition.Position.Size * PricesEntity.Prices[Index].ClosePrice.Bid;
+                Balance += closingPosition.Position.Size * PricesEntity.Prices[Index - 1].ClosePrice.Bid;
             }
             else
             {
@@ -40,16 +40,13 @@ namespace TestEnv.TestAPI
 
         public string CreatePosition(PositionCreateEntity positionSetup)
         {
-            if (Index < 0)
-                throw new Exception("Wrong prices index");
-
             DealCount = DealCount++;
             Positions.Add(new OpenPosition()
             {
                 Market = new Market()
                 {
                     Epic = positionSetup.Epic,
-                    Bid = PricesEntity.Prices[Index].ClosePrice.Bid
+                    Bid = PricesEntity.Prices[Index - 1].ClosePrice.Bid
                 },
                 Position = new Position()
                 {
@@ -58,7 +55,7 @@ namespace TestEnv.TestAPI
                     Direction = positionSetup.Direction
                 }
             });
-            Balance -= positionSetup.Size * PricesEntity.Prices[Index].ClosePrice.Bid;
+            Balance -= positionSetup.Size * PricesEntity.Prices[Index - 1].ClosePrice.Ask;
 
             return DealCount.ToString();
         }
@@ -77,7 +74,7 @@ namespace TestEnv.TestAPI
             {
                 InstrumentType = epic
             };
-            if (Index <= PricesEntity.Prices.Count && PricesEntity.Prices.Count - 1 >= Index + max.Value)
+            if (Index <= PricesEntity.Prices.Count && PricesEntity.Prices.Count >= Index + max.Value)
             {
                 result.Prices = new List<PriceEntity>(PricesEntity.Prices.GetRange(Index, max.Value));
                 Index += max.Value;//check
@@ -87,10 +84,7 @@ namespace TestEnv.TestAPI
 
         public double GetBalance()
         {
-            if (Index < 0)
-                throw new Exception("Wrong prices index");
-
-            return Balance + Positions.Select(p => PricesEntity.Prices[Index].ClosePrice.Bid * p.Position.Size).Sum();
+            return Balance + Positions.Select(p => PricesEntity.Prices[Index - 1].ClosePrice.Bid * p.Position.Size).Sum();
         }
     }
 }
