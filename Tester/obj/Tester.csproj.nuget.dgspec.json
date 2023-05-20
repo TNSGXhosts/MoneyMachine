@@ -1,0 +1,150 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/vitaliikonnov/Projects/MoneyMachine/Tester/Tester.csproj": {}
+  },
+  "projects": {
+    "/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/MoneyMachine.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/MoneyMachine.csproj",
+        "projectName": "MoneyMachine",
+        "projectPath": "/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/MoneyMachine.csproj",
+        "packagesPath": "/Users/vitaliikonnov/.nuget/packages/",
+        "outputPath": "/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/vitaliikonnov/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "Microsoft.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[7.0.1, )"
+            },
+            "NetTrader.Indicator": {
+              "target": "Package",
+              "version": "[1.0.5, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "RestSharp": {
+              "target": "Package",
+              "version": "[110.2.0, )"
+            },
+            "System.Configuration.ConfigurationManager": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "Websocket.Client": {
+              "target": "Package",
+              "version": "[4.6.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.203/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/vitaliikonnov/Projects/MoneyMachine/Tester/Tester.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/vitaliikonnov/Projects/MoneyMachine/Tester/Tester.csproj",
+        "projectName": "Tester",
+        "projectPath": "/Users/vitaliikonnov/Projects/MoneyMachine/Tester/Tester.csproj",
+        "packagesPath": "/Users/vitaliikonnov/.nuget/packages/",
+        "outputPath": "/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/vitaliikonnov/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/MoneyMachine.csproj": {
+                "projectPath": "/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/MoneyMachine.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.203/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MoneyMachine\MoneyMachine.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Tester\" />
+    <None Remove="TestAPI\" />
+    <None Remove="Tools\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tester\" />
+    <Folder Include="TestAPI\" />
+    <Folder Include="Tools\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspose.Cells" Version="23.5.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/bin/Debug/net7.0/Tester
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/bin/Debug/net7.0/Tester.deps.json
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/bin/Debug/net7.0/Tester.runtimeconfig.json
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/bin/Debug/net7.0/Tester.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/bin/Debug/net7.0/Tester.pdb
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/Tester.csproj.AssemblyReference.cache
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/Tester.GeneratedMSBuildEditorConfig.editorconfig
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/Tester.AssemblyInfoInputs.cache
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/Tester.AssemblyInfo.cs
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/Tester.csproj.CoreCompileInputs.cache
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/Tester.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/refint/Tester.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/Tester.pdb
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/Tester.genruntimeconfig.cache
+/Users/vitaliikonnov/Projects/MoneyMachine/Tester/obj/Debug/net7.0/ref/Tester.dll
