@@ -8,17 +8,23 @@ namespace TestEnv.TestAPI
 {
 	public class APIEmulator : IDataAccess
 	{
-        private PricesEntity PricesEntity;
         private List<OpenPosition> Positions;
-        private int Index;
+        private List<PeriodData> PeriodDatas;
+        private int LowerResolutionIndex;
+        private int UpperResolutionIndex;
         private int DealCount;
         private double Balance;
+        private Resolution LowerResolution;
+        private Resolution UpperResolution;
 
-		public APIEmulator(PricesEntity pricesEntity)
+		public APIEmulator(List<PeriodData> periodDatas, Resolution lowerResolution, Resolution upperResolution)
 		{
-            PricesEntity = pricesEntity;
+            PeriodDatas = periodDatas;
+            LowerResolution = lowerResolution;
+            UpperResolution = upperResolution;
             Positions = new List<OpenPosition>();
-            Index = 0;
+            LowerResolutionIndex = 0;
+            UpperResolutionIndex = 0;
             Balance = 1000;
 		}
 
@@ -28,7 +34,7 @@ namespace TestEnv.TestAPI
             if (closingPosition != null)
             {
                 Positions.Remove(closingPosition);
-                Balance += closingPosition.Position.Size * PricesEntity.Prices[Index - 1].ClosePrice.Bid;
+                Balance += closingPosition.Position.Size * PeriodDatas[UpperResolutionIndex].LowerPeriod[LowerResolutionIndex].ClosePrice.Bid;
             }
             else
             {
@@ -46,7 +52,7 @@ namespace TestEnv.TestAPI
                 Market = new Market()
                 {
                     Epic = positionSetup.Epic,
-                    Bid = PricesEntity.Prices[Index - 1].ClosePrice.Bid
+                    Bid = PeriodDatas[UpperResolutionIndex].LowerPeriod[LowerResolutionIndex].ClosePrice.Bid
                 },
                 Position = new Position()
                 {
@@ -55,7 +61,7 @@ namespace TestEnv.TestAPI
                     Direction = positionSetup.Direction
                 }
             });
-            Balance -= positionSetup.Size * PricesEntity.Prices[Index - 1].ClosePrice.Ask;
+            Balance -= positionSetup.Size * PeriodDatas[UpperResolutionIndex].LowerPeriod[LowerResolutionIndex].ClosePrice.Ask;
 
             return DealCount.ToString();
         }
@@ -67,24 +73,62 @@ namespace TestEnv.TestAPI
 
         public PricesEntity GetHistoricalPrices(string epic, Resolution? resolution = null, int? max = null, DateTime? from = null, DateTime? to = null)
         {
-            if (PricesEntity?.Prices == null || PricesEntity.Prices.Count == 0)
+            if (PeriodDatas == null || PeriodDatas.Count == 0)
                 throw new Exception("No prices");
 
             var result = new PricesEntity()
             {
                 InstrumentType = epic
             };
-            if (Index <= PricesEntity.Prices.Count && PricesEntity.Prices.Count >= Index + max.Value)
+            if (resolution == LowerResolution)
             {
-                result.Prices = new List<PriceEntity>(PricesEntity.Prices.GetRange(Index, max.Value));
-                Index += max.Value;//check
+                //var count = PeriodDatas[UpperResolutionIndex].LowerPeriod.Count - 1 >= LowerResolutionIndex + max.Value ? max.Value : PeriodDatas[UpperResolutionIndex].LowerPeriod.Count - 1 - LowerResolutionIndex;
+                if (LowerResolutionIndex < PeriodDatas[UpperResolutionIndex].LowerPeriod.Count /*&& PeriodDatas[UpperResolutionIndex].LowerPeriod.Count - 1 >= LowerResolutionIndex + max.Value*/)
+                {
+                    result.Prices = new List<PriceEntity>(PeriodDatas[UpperResolutionIndex].LowerPeriod.GetRange(LowerResolutionIndex, max.Value));
+                    LowerResolutionIndex = LowerResolutionIndex + max.Value + 1 >= PeriodDatas[UpperResolutionIndex].LowerPeriod.Count ? 0 : LowerResolutionIndex + max.Value;//todo:check
+                }
             }
+            else
+            {
+                if (UpperResolutionIndex < PeriodDatas.Count && PeriodDatas.Count - 1 >= UpperResolutionIndex + max.Value)
+                {
+                    result.Prices = new List<PriceEntity>(PeriodDatas.GetRange(UpperResolutionIndex + 1, max.Value).Select(p => p.UpperPeriod));
+                    UpperResolutionIndex += max.Value;//check
+                }
+            }
+
+            return result;
+        }
+
+        public PricesEntity GetHistoricalPricesHourPeriodForTesting(string epic, Resolution? resolution = null, int? max = null, DateTime? from = null, DateTime? to = null)
+        {
+            if (PeriodDatas == null || PeriodDatas.Count == 0)
+                throw new Exception("No prices");
+
+            var result = new PricesEntity()
+            {
+                InstrumentType = epic
+            };
+            if (resolution == LowerResolution)//for lower only
+            {
+                var range = PeriodDatas.GetRange(UpperResolutionIndex - 5, 4);
+                var i = 1;
+                var lowerRange = range.First().LowerPeriod;
+                while(lowerRange.Count < 20)
+                {
+                    lowerRange.AddRange(range[i].LowerPeriod);
+                    i += 1;
+                }
+                result.Prices = lowerRange;
+            }
+
             return result;
         }
 
         public double GetBalance()
         {
-            return Balance + Positions.Select(p => PricesEntity.Prices[Index - 1].ClosePrice.Bid * p.Position.Size).Sum();
+            return Balance + Positions.Select(p => PeriodDatas[UpperResolutionIndex].LowerPeriod[LowerResolutionIndex].ClosePrice.Bid * p.Position.Size).Sum();
         }
     }
 }

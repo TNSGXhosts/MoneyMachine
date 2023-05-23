@@ -288,8 +288,8 @@
 
     public class PriceEntity
     {
-        public string SnapshotTime { get; set; }
-        public string SnapshotTimeUtc { get; set; }
+        public DateTime SnapshotTime { get; set; }
+        public DateTime SnapshotTimeUtc { get; set; }
         public InternalPrice OpenPrice { get; set; }
         public InternalPrice ClosePrice { get; set; }
         public InternalPrice HighPrice { get; set; }

@@ -23,13 +23,17 @@ namespace MoneyMachine.BL
 		private double _usdPosition = 0;
 		private const string _currentPair = "PRG";   //todo:set global configuration for all layers
 		public double _balance = 1000;
-		private Enums.Resolution DefaultResolution = Enums.Resolution.HOUR;
+		private Enums.Resolution LowerResolution = Enums.Resolution.HOUR;
+        private Enums.Resolution UpperResolution = Enums.Resolution.DAY;
 
-		private BollingerBandSerie _bollingerBandSerie;
-		private RSISerie _rsiSerie;
-		private OpenPosition openPosition;
-		private List<Ohlc> ohlcList;
-		private ILogger Logger;
+        private BollingerBandSerie BollingerBandLowerSerie;
+		private RSISerie RsiLowerSerie;
+        private BollingerBandSerie BollingerBandUpperSerie;
+        private RSISerie RsiUpperSerie;
+        private OpenPosition openPosition;
+		private List<Ohlc> OhlcLowerPeriod;
+        private List<Ohlc> OhlcUpperPeriod;
+        private ILogger Logger;
 
 		private int lastLog;
 		private DateTime lastUpdate;
@@ -51,34 +55,52 @@ namespace MoneyMachine.BL
 			Logger = logger;
 		}
 
-		public void SetRSI(List<Ohlc> data)
+		public void SetRSI(bool isLower)
 		{
 			var rsi = new RSI(_defaultWindow);
-			rsi.Load(data);
-			_rsiSerie = rsi.Calculate();
+			rsi.Load(isLower ? OhlcLowerPeriod : OhlcUpperPeriod);
+			if (isLower)
+				RsiLowerSerie = rsi.Calculate();
+			else
+				RsiUpperSerie = rsi.Calculate();
 		}
 
-		public void SetBollingerBand(List<Ohlc> data)
+		public void SetBollingerBand(bool isLower)
 		{
 			var bollingerBand = new BollingerBand(_bollingerWindow, 2);
-			bollingerBand.Load(data);
-			_bollingerBandSerie = bollingerBand.Calculate();
+			bollingerBand.Load(isLower ? OhlcLowerPeriod : OhlcUpperPeriod);
+			if (isLower)
+				BollingerBandLowerSerie = bollingerBand.Calculate();
+			else
+				BollingerBandUpperSerie = bollingerBand.Calculate();
 		}
 
 		public void LoadHistoricalData()
 		{
-			var data = restApiClient.GetHistoricalPrices(_currentPair, DefaultResolution, _bollingerWindow, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow);
-			ohlcList = data.Prices.Select(p => new Ohlc
-			{
-				High = p.HighPrice.Ask,
-				Low = p.LowPrice.Ask,
-				Close = p.ClosePrice.Ask,
-				Date = DateTime.Parse(p.SnapshotTime)
-			}).ToList();
-            SetBollingerBand(ohlcList);
-            SetRSI(ohlcList);
-			lastUpdate = DateTime.UtcNow;
-		}
+			//Upper should be first for testing
+            var data = restApiClient.GetHistoricalPrices(_currentPair, UpperResolution, _bollingerWindow, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow);
+            OhlcUpperPeriod = data.Prices.Select(p => new Ohlc
+            {
+                High = p.HighPrice.Ask,
+                Low = p.LowPrice.Ask,
+                Close = p.ClosePrice.Ask,
+                Date = p.SnapshotTime
+            }).ToList();
+            SetBollingerBand(false);
+            SetRSI(false);
+            lastUpdate = DateTime.UtcNow;
+			//for test
+            data = restApiClient.GetHistoricalPricesHourPeriodForTesting(_currentPair, LowerResolution, _bollingerWindow, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow);
+            OhlcLowerPeriod = data.Prices.Select(p => new Ohlc
+            {
+                High = p.HighPrice.Ask,
+                Low = p.LowPrice.Ask,
+                Close = p.ClosePrice.Ask,
+                Date = p.SnapshotTime
+            }).ToList();
+            SetBollingerBand(true);
+            SetRSI(true);
+        }
 
 		public void UpdateCurrentValue(MarketDataUpdateEntity update)
 		{
@@ -90,33 +112,33 @@ namespace MoneyMachine.BL
 
 				if (isDataValid)
 				{
-					ohlcList.Add(new Ohlc()
+					OhlcLowerPeriod.Add(new Ohlc()
 					{
 						High = data.Prices.LastOrDefault().HighPrice.Ask,
 						Low = data.Prices.LastOrDefault().LowPrice.Ask,
 						Close = data.Prices.LastOrDefault().ClosePrice.Ask,
-						Date = DateTime.Parse(data.Prices.LastOrDefault().SnapshotTime)
+						Date = data.Prices.LastOrDefault().SnapshotTime
 					});
-					SetBollingerBand(ohlcList);
-					SetRSI(ohlcList);
+					SetBollingerBand(true);
+					SetRSI(true);
 				}
 
 				lastLog = currentMinute;
 				
-				Console.WriteLine($"Bollinger Band Upper: {_bollingerBandSerie.UpperBand.LastOrDefault()}");
-				Console.WriteLine($"Bollinger Band Lower: {_bollingerBandSerie.LowerBand.LastOrDefault()}");
-				Console.WriteLine($"RSI: {_rsiSerie.RSI.LastOrDefault().Value}");
+				Console.WriteLine($"Bollinger Band Upper: {BollingerBandUpperSerie.UpperBand.LastOrDefault()}");
+				Console.WriteLine($"Bollinger Band Lower: {BollingerBandUpperSerie.LowerBand.LastOrDefault()}");
+				Console.WriteLine($"RSI: {RsiUpperSerie.RSI.LastOrDefault().Value}");
 				Console.WriteLine($"Current bid: {update.Payload.Ofr}");
 
-				if (_bollingerBandSerie.UpperBand.LastOrDefault().HasValue && _bollingerBandSerie.UpperBand.LastOrDefault().Value < update.Payload.Bid
-					&& _rsiSerie.RSI.LastOrDefault().HasValue && _rsiSerie.RSI.LastOrDefault().Value > _rsiUpperBound && openPosition != null)
+				if (BollingerBandUpperSerie.UpperBand.LastOrDefault().HasValue && BollingerBandUpperSerie.UpperBand.LastOrDefault().Value < update.Payload.Bid
+					&& RsiUpperSerie.RSI.LastOrDefault().HasValue && RsiUpperSerie.RSI.LastOrDefault().Value > _rsiUpperBound && openPosition != null)
 				{
 					//Sell signal
 					Console.WriteLine($"Sell signal, bid: {update.Payload.Bid}");
 					restApiClient.ClosePosition(openPosition.Position.DealId);
 				}
-				if (_bollingerBandSerie.LowerBand.LastOrDefault().HasValue && _bollingerBandSerie.LowerBand.LastOrDefault().Value > update.Payload.Bid
-					&& _rsiSerie.RSI.LastOrDefault().HasValue && _rsiSerie.RSI.LastOrDefault().Value < _rsiLowerBound && openPosition == null)
+				if (BollingerBandUpperSerie.LowerBand.LastOrDefault().HasValue && BollingerBandUpperSerie.LowerBand.LastOrDefault().Value > update.Payload.Bid
+					&& RsiUpperSerie.RSI.LastOrDefault().HasValue && RsiUpperSerie.RSI.LastOrDefault().Value < _rsiLowerBound && openPosition == null)
 				{
 					//Buy signal
                     Console.WriteLine($"Buy signal, bid: {update.Payload.Bid}");
@@ -131,86 +153,106 @@ namespace MoneyMachine.BL
 				}
 				if (isDataValid)
 				{
-					ohlcList.Remove(ohlcList.LastOrDefault());
+					OhlcLowerPeriod.Remove(OhlcLowerPeriod.LastOrDefault());
 				}
 			}
 			if (DateTime.UtcNow.Hour - lastUpdate.Hour >= 1)
 				LoadHistoricalData();
         }
 
-        public void CheckRegularData()
+		public void CheckUpperRegularData()
+		{
+			CheckRegularData(UpperResolution, false);
+		}
+
+        public void CheckLowerRegularData()
         {
-            var data = restApiClient.GetHistoricalPrices(_currentPair, DefaultResolution, 1, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow);
+			CheckRegularData(LowerResolution, true);
+        }
+
+		public void CheckRegularData(Resolution resolution, bool isLower)
+		{
+            var data = restApiClient.GetHistoricalPrices(_currentPair, resolution, 1, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow);
             var isDataValid = data.Prices?.LastOrDefault() != null;
 
-			if (isDataValid)
-			{
-				var update = new Ohlc()
-				{
-					High = data.Prices.LastOrDefault().HighPrice.Bid,
-					Low = data.Prices.LastOrDefault().LowPrice.Bid,
-					Close = data.Prices.LastOrDefault().ClosePrice.Bid,
-					Date = DateTime.Parse(data.Prices.LastOrDefault().SnapshotTime)
-				};
+            if (isDataValid)
+            {
+                var update = new Ohlc()
+                {
+                    High = data.Prices.LastOrDefault().HighPrice.Bid,
+                    Low = data.Prices.LastOrDefault().LowPrice.Bid,
+                    Close = data.Prices.LastOrDefault().ClosePrice.Bid,
+                    Date = data.Prices.LastOrDefault().SnapshotTime
+                };
 
 				//ohlcList.Remove(ohlcList.First());//todo:???
-				ohlcList.Add(update);
-				SetBollingerBand(ohlcList);
-				SetRSI(ohlcList);
+				if (isLower)
+					OhlcLowerPeriod.Add(update);
+				else
+					OhlcUpperPeriod.Add(update);
+                SetBollingerBand(isLower);
+                SetRSI(isLower);
 
-				if (CheckSellSignal(update.Close))
+				if (isLower)
 				{
-					//Sell signal
-					Logger.LogSignal(false, update.Close);
-					restApiClient.ClosePosition(openPosition.Position.DealId);
-					openPosition = null;
-					if (update.Close > LastDealPrice)
-						CountSuccessDeals = ++CountSuccessDeals;
-                    LastDealPrice = 0;
-					CountAllDeals = ++CountAllDeals;
-					//Logger.Log(Fields.PercentSuccessTrades, CountSuccessDeals == 0 ? 0 : CountAllDeals /CountSuccessDeals);
-                }
-				if (CheckBuySignal(update.Close))
-				{
-					//Buy signal
-					Logger.LogSignal(true, update.Close);
-					var position = new PositionCreateEntity()
+					if (CheckSellSignal(update.Close))
 					{
-						Direction = DealDirection.BUY.ToString(),
-						Epic = _currentPair,
-						Size = Math.Round(_percentTrade * _balance / update.Close, 0) //(int)Math.Round(_percentTrade * _balance / update.Close)
-					};
-					restApiClient.CreatePosition(position);
-					openPosition = restApiClient.GetAllPositions().FirstOrDefault();
-                    LastDealPrice = update.Close;
-                }
-                _balance = restApiClient.GetBalance();
+						//Sell signal
+						Logger.LogSignal(false, update.Close);
+						restApiClient.ClosePosition(openPosition.Position.DealId);
+						openPosition = null;
+						if (update.Close > LastDealPrice)
+							CountSuccessDeals = ++CountSuccessDeals;
+						LastDealPrice = 0;
+						CountAllDeals = ++CountAllDeals;
+						//Logger.Log(Fields.PercentSuccessTrades, CountSuccessDeals == 0 ? 0 : CountAllDeals /CountSuccessDeals);
+					}
+					if (CheckBuySignal(update.Close))
+					{
+						//Buy signal
+						Logger.LogSignal(true, update.Close);
+						var position = new PositionCreateEntity()
+						{
+							Direction = DealDirection.BUY.ToString(),
+							Epic = _currentPair,
+							Size = Math.Round(_percentTrade * _balance / update.Close, 0) //(int)Math.Round(_percentTrade * _balance / update.Close)
+						};
+						restApiClient.CreatePosition(position);
+						openPosition = restApiClient.GetAllPositions().FirstOrDefault();
+						LastDealPrice = update.Close;
+					}
+					_balance = restApiClient.GetBalance();
 
-                Logger.LogCurrentData(_bollingerBandSerie.UpperBand.LastOrDefault().Value, _bollingerBandSerie.LowerBand.LastOrDefault().Value, _rsiSerie.RSI.LastOrDefault().Value, update.Close, _balance, update.Date);
-            }
+					Logger.LogCurrentData(BollingerBandLowerSerie.UpperBand.LastOrDefault().Value, BollingerBandLowerSerie.LowerBand.LastOrDefault().Value, RsiLowerSerie.RSI.LastOrDefault().Value, update.Close, _balance, update.Date);
+				}
+			}
         }
 
 		private bool CheckSellSignal(double currentPrice)
 		{
-			return _bollingerBandSerie.UpperBand.LastOrDefault().HasValue && _bollingerBandSerie.UpperBand.LastOrDefault().Value < currentPrice
-				&& CheckSellByRSI();
+			return BollingerBandUpperSerie.UpperBand.LastOrDefault().HasValue && BollingerBandUpperSerie.UpperBand.LastOrDefault().Value < currentPrice
+				&& BollingerBandLowerSerie.UpperBand.LastOrDefault().HasValue && BollingerBandLowerSerie.UpperBand.LastOrDefault().Value < currentPrice
+                && CheckSellByRSI();
         }
 
         private bool CheckBuySignal(double currentPrice)
 		{
-			return _bollingerBandSerie.LowerBand.LastOrDefault().HasValue && _bollingerBandSerie.LowerBand.LastOrDefault().Value > currentPrice
-				&& CheckBuyByRSI();
+			return BollingerBandUpperSerie.LowerBand.LastOrDefault().HasValue && BollingerBandUpperSerie.LowerBand.LastOrDefault().Value > currentPrice
+				&& BollingerBandLowerSerie.LowerBand.LastOrDefault().HasValue && BollingerBandLowerSerie.LowerBand.LastOrDefault().Value > currentPrice
+                && CheckBuyByRSI();
 
         }
 
         private bool CheckSellByRSI()
 		{
-			return _rsiSerie.RSI.LastOrDefault().HasValue && _rsiSerie.RSI.LastOrDefault().Value > _rsiUpperBound && openPosition != null;
+			return RsiUpperSerie.RSI.LastOrDefault().HasValue && RsiUpperSerie.RSI.LastOrDefault().Value > _rsiUpperBound
+				&& RsiLowerSerie.RSI.LastOrDefault().HasValue && RsiLowerSerie.RSI.LastOrDefault().Value > _rsiUpperBound && openPosition != null;
         }
 
         private bool CheckBuyByRSI()
 		{
-			return _rsiSerie.RSI.LastOrDefault().HasValue && _rsiSerie.RSI.LastOrDefault().Value < _rsiLowerBound && openPosition == null;
+			return RsiUpperSerie.RSI.LastOrDefault().HasValue && RsiUpperSerie.RSI.LastOrDefault().Value < _rsiLowerBound
+				&& RsiLowerSerie.RSI.LastOrDefault().HasValue && RsiLowerSerie.RSI.LastOrDefault().Value < _rsiLowerBound && openPosition == null;
         }
     }
 }

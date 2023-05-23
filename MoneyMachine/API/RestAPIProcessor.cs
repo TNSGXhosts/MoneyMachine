@@ -440,6 +440,11 @@ namespace MoneyMachine.API
             return new Tuple<string, string>(_securityToken, _CST);
         }
 
+        public PricesEntity GetHistoricalPricesHourPeriodForTesting(string epic, Resolution? resolution = null, int? max = null, DateTime? from = null, DateTime? to = null)
+        {
+            throw new NotImplementedException("Testing metod");
+        }
+
         #endregion
     }
 }

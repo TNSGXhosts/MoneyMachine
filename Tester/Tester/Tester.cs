@@ -40,9 +40,9 @@ namespace TestEnv.Tester
         public void GetYearPrices()
         {
             var prices = APIProcessor.GetHistoricalPrices(CurrentPair, MoneyMachine.Enums.Resolution.MINUTE_30, 1000);
-            while ((DateTime.UtcNow - DateTime.Parse(prices.Prices.First().SnapshotTime).ToUniversalTime()).Days < 365)
+            while ((DateTime.UtcNow - prices.Prices.First().SnapshotTime.ToUniversalTime()).Days < 365)
             {
-                var lastDate = DateTime.Parse(prices.Prices.First().SnapshotTime);
+                var lastDate = prices.Prices.First().SnapshotTime;
                 var olderPrices = APIProcessor.GetHistoricalPrices(CurrentPair, MoneyMachine.Enums.Resolution.MINUTE_30, 1000, to: lastDate);
                 var pricesList = new List<PriceEntity>();
                 pricesList.AddRange(olderPrices.Prices);

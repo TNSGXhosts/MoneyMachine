@@ -46,7 +46,8 @@ namespace TestEnv.Tools
             // Accessing the instance of the newly added chart
             Aspose.Cells.Charts.Chart chart = MainSheet.Charts[chartIndex];
             // Setting chart data source as the range  "A1:C4"
-            chart.SetChartDataRange($"J2:K{Index}", true);
+            if(Index > 2)
+                chart.SetChartDataRange($"J2:K{Index}", true);
 
             // Save the Excel file.
             Workbook.Save(Path.Join(DataPath, "DataSet.xlsx"));
