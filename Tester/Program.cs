@@ -7,26 +7,27 @@ using TestEnv.Tester;
 using TestEnv.Tools;
 
 Console.WriteLine("Hello, World!");
-var testEpic = "NDAQ";
+var testEpic = "PGR"; //"PGR", "BTCUSD", ICE, JNJ, TXT, PANW, Llus, SPY
 
 var restApi = new APIProcessor();
-var testData = GetTestingData();
+var testData = GetTestingData(MoneyMachine.Enums.Resolution.HOUR);
 var apiEmulator = new APIEmulator(testData);
-//var res = restApi.GetMarkets("US Wall Street 30");
+var res = restApi.GetMarkets("US Wall Street 30");
+
 var logger = new ExcelLogger();
 var monitor = new MonitoringManager(apiEmulator, logger);
-for (int i = 20; i < testData.Prices.Count()-1; i++)
+for (int i = 20; i < testData.Prices.Count(); i++)
     monitor.CheckRegularData();
 logger.SaveExcel();
-Console.WriteLine($"Start balance: 1000, end balance: {apiEmulator.GetBalance()}");
+Console.WriteLine($"Start balance: 1000, end balance: {apiEmulator.GetBalance()}, percent of success: {monitor.PercentSuccess}");
 
-PricesEntity GetTestingData()
+PricesEntity GetTestingData(MoneyMachine.Enums.Resolution resolution)
 {
-    var prices = restApi.GetHistoricalPrices(testEpic, MoneyMachine.Enums.Resolution.DAY, 1000);
+    var prices = restApi.GetHistoricalPrices(testEpic, resolution, 365);
     while ((DateTime.UtcNow - DateTime.Parse(prices.Prices.First().SnapshotTime).ToUniversalTime()).Days <= 365)
     {
         var lastDate = DateTime.Parse(prices.Prices.First().SnapshotTime);
-        var olderPrices = restApi.GetHistoricalPrices(testEpic, MoneyMachine.Enums.Resolution.DAY, 1000, to: lastDate);
+        var olderPrices = restApi.GetHistoricalPrices(testEpic, resolution, 500, to: lastDate);
         var pricesList = new List<PriceEntity>();
         pricesList.AddRange(olderPrices.Prices);
         pricesList.AddRange(prices.Prices);

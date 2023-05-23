@@ -35,6 +35,10 @@ namespace MoneyMachine.BL
 		private DateTime lastUpdate;
 
 		private int Minute = 0;
+		private double LastDealPrice = 0;
+		private int CountSuccessDeals = 0;
+		private int CountAllDeals = 0;
+		public double PercentSuccess { get { return CountSuccessDeals == 0 ? 0 : (double)CountSuccessDeals/CountAllDeals; } }
 
 
         private const int _defaultWindow = 14;
@@ -115,7 +119,7 @@ namespace MoneyMachine.BL
 					&& _rsiSerie.RSI.LastOrDefault().HasValue && _rsiSerie.RSI.LastOrDefault().Value < _rsiLowerBound && openPosition == null)
 				{
 					//Buy signal
-					Console.WriteLine($"Buy signal, bid: {update.Payload.Bid}");
+                    Console.WriteLine($"Buy signal, bid: {update.Payload.Bid}");
 					var position = new PositionCreateEntity()
 					{
 						Direction = DealDirection.BUY.ToString(),
@@ -160,7 +164,12 @@ namespace MoneyMachine.BL
 					Logger.LogSignal(false, update.Close);
 					restApiClient.ClosePosition(openPosition.Position.DealId);
 					openPosition = null;
-				}
+					if (update.Close > LastDealPrice)
+						CountSuccessDeals = ++CountSuccessDeals;
+                    LastDealPrice = 0;
+					CountAllDeals = ++CountAllDeals;
+					//Logger.Log(Fields.PercentSuccessTrades, CountSuccessDeals == 0 ? 0 : CountAllDeals /CountSuccessDeals);
+                }
 				if (CheckBuySignal(update.Close))
 				{
 					//Buy signal
@@ -173,7 +182,8 @@ namespace MoneyMachine.BL
 					};
 					restApiClient.CreatePosition(position);
 					openPosition = restApiClient.GetAllPositions().FirstOrDefault();
-				}
+                    LastDealPrice = update.Close;
+                }
                 _balance = restApiClient.GetBalance();
 
                 Logger.LogCurrentData(_bollingerBandSerie.UpperBand.LastOrDefault().Value, _bollingerBandSerie.LowerBand.LastOrDefault().Value, _rsiSerie.RSI.LastOrDefault().Value, update.Close, _balance, update.Date);

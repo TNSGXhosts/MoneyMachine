@@ -21,6 +21,7 @@ namespace MoneyMachine.Constants
         public const string Date = "Date";
         public const string ProductPriceChanging = "Product Price Changing";
         public const string BalanceChanging = "Balance Changing";
+        public const string PercentSuccessTrades = "Succes %: {0}";
     }
 
     public class EndPoints
