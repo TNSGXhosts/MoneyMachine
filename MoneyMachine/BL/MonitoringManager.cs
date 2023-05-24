@@ -230,15 +230,15 @@ namespace MoneyMachine.BL
 
 		private bool CheckSellSignal(double currentPrice)
 		{
-			return BollingerBandUpperSerie.UpperBand.LastOrDefault().HasValue && BollingerBandUpperSerie.UpperBand.LastOrDefault().Value < currentPrice
-				&& BollingerBandLowerSerie.UpperBand.LastOrDefault().HasValue && BollingerBandLowerSerie.UpperBand.LastOrDefault().Value < currentPrice
+			return ((BollingerBandUpperSerie.UpperBand.LastOrDefault().HasValue && BollingerBandUpperSerie.UpperBand.LastOrDefault().Value < currentPrice)
+				&& (BollingerBandLowerSerie.UpperBand.LastOrDefault().HasValue && BollingerBandLowerSerie.UpperBand.LastOrDefault().Value < currentPrice))
                 && CheckSellByRSI();
         }
 
         private bool CheckBuySignal(double currentPrice)
 		{
-			return BollingerBandUpperSerie.LowerBand.LastOrDefault().HasValue && BollingerBandUpperSerie.LowerBand.LastOrDefault().Value > currentPrice
-				&& BollingerBandLowerSerie.LowerBand.LastOrDefault().HasValue && BollingerBandLowerSerie.LowerBand.LastOrDefault().Value > currentPrice
+			return ((BollingerBandUpperSerie.LowerBand.LastOrDefault().HasValue && BollingerBandUpperSerie.LowerBand.LastOrDefault().Value > currentPrice)
+				|| (BollingerBandLowerSerie.LowerBand.LastOrDefault().HasValue && BollingerBandLowerSerie.LowerBand.LastOrDefault().Value > currentPrice))
                 && CheckBuyByRSI();
 
         }

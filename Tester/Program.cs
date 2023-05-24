@@ -9,11 +9,11 @@ using TestEnv.Tester;
 using TestEnv.Tools;
 
 Console.WriteLine("Hello, World!");
-var testEpic = "PGR"; //"PGR", "BTCUSD", ICE, JNJ, TXT, PANW, Llus, SPY, US30
-var timePeriod = 364;
+var testEpic = "TSLA"; //"PGR", "BTCUSD", ICE, JNJ, TXT, PANW, Llus, SPY, US30
+var timePeriod = 364 * 5;
 
 var restApi = new APIProcessor();
-var testUpperResolutionData = GetTestingData2(Resolution.WEEK, DateTime.UtcNow.AddDays(-timePeriod).Date, DateTime.UtcNow.Date);
+var testUpperResolutionData = GetTestingData2(Resolution.DAY, DateTime.UtcNow.AddDays(-timePeriod).Date, DateTime.UtcNow.Date);
 var testLowerResolutionData = GetTestingPeriodData(Resolution.HOUR, DateTime.UtcNow.AddDays(-timePeriod), DateTime.UtcNow);
 
 //var testUpperResolutionData = GetTestingData(Resolution.DAY, DateTime.UtcNow.AddDays(-timePeriod).Date, DateTime.UtcNow.Date);
