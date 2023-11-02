@@ -12,15 +12,23 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Tester\" />
-    <None Remove="TestAPI\" />
     <None Remove="Tools\" />
+    <None Remove="DBEntities\" />
+    <None Remove="DataAccess\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tester\" />
-    <Folder Include="TestAPI\" />
     <Folder Include="Tools\" />
+    <Folder Include="DBEntities\" />
+    <Folder Include="DataAccess\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Aspose.Cells" Version="23.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
   </ItemGroup>
 </Project>

@@ -231,28 +231,28 @@ namespace MoneyMachine.BL
 		private bool CheckSellSignal(double currentPrice)
 		{
 			return ((BollingerBandUpperSerie.UpperBand.LastOrDefault().HasValue && BollingerBandUpperSerie.UpperBand.LastOrDefault().Value < currentPrice)
-				&& (BollingerBandLowerSerie.UpperBand.LastOrDefault().HasValue && BollingerBandLowerSerie.UpperBand.LastOrDefault().Value < currentPrice))
+				/*|| (BollingerBandLowerSerie.UpperBand.LastOrDefault().HasValue && BollingerBandLowerSerie.UpperBand.LastOrDefault().Value < currentPrice)*/)
                 && CheckSellByRSI();
         }
 
         private bool CheckBuySignal(double currentPrice)
 		{
 			return ((BollingerBandUpperSerie.LowerBand.LastOrDefault().HasValue && BollingerBandUpperSerie.LowerBand.LastOrDefault().Value > currentPrice)
-				|| (BollingerBandLowerSerie.LowerBand.LastOrDefault().HasValue && BollingerBandLowerSerie.LowerBand.LastOrDefault().Value > currentPrice))
+				&& (BollingerBandLowerSerie.LowerBand.LastOrDefault().HasValue && BollingerBandLowerSerie.LowerBand.LastOrDefault().Value > currentPrice))
                 && CheckBuyByRSI();
 
         }
 
         private bool CheckSellByRSI()
 		{
-			return RsiUpperSerie.RSI.LastOrDefault().HasValue && RsiUpperSerie.RSI.LastOrDefault().Value > _rsiUpperBound
-				&& RsiLowerSerie.RSI.LastOrDefault().HasValue && RsiLowerSerie.RSI.LastOrDefault().Value > _rsiUpperBound && openPosition != null;
+			return ((RsiUpperSerie.RSI.LastOrDefault().HasValue && RsiUpperSerie.RSI.LastOrDefault().Value > _rsiUpperBound)
+				/*|| (RsiLowerSerie.RSI.LastOrDefault().HasValue && RsiLowerSerie.RSI.LastOrDefault().Value > _rsiUpperBound)*/) && openPosition != null;
         }
 
         private bool CheckBuyByRSI()
 		{
-			return RsiUpperSerie.RSI.LastOrDefault().HasValue && RsiUpperSerie.RSI.LastOrDefault().Value < _rsiLowerBound
-				&& RsiLowerSerie.RSI.LastOrDefault().HasValue && RsiLowerSerie.RSI.LastOrDefault().Value < _rsiLowerBound && openPosition == null;
+			return ((RsiUpperSerie.RSI.LastOrDefault().HasValue && RsiUpperSerie.RSI.LastOrDefault().Value < _rsiLowerBound)
+				&& (RsiLowerSerie.RSI.LastOrDefault().HasValue && RsiLowerSerie.RSI.LastOrDefault().Value < _rsiLowerBound)) && openPosition == null;
         }
     }
 }

@@ -32,16 +32,16 @@ namespace MoneyMachine.API
 		{
             _client = new RestClient(ApplicationConstants.BaseAPIUrl);
             StartSession();
-            _accountName = ConfigurationManager.AppSettings.Get("AccountName");
+            _accountName = ConfigurationManager.AppSettings.Get(ConfigurationKeys.AccountName);
             if (!string.IsNullOrEmpty(_accountName))
                 throw new Exception("Cannot get account Name");
         }
 
         public void StartSession()
         {
-            var apiKey = ConfigurationManager.AppSettings.Get("ApiKey");
-            var identifier = ConfigurationManager.AppSettings.Get("Identifier");
-            var password = ConfigurationManager.AppSettings.Get("Password");
+            var apiKey = ConfigurationManager.AppSettings.Get(ConfigurationKeys.ApiKey);
+            var identifier = ConfigurationManager.AppSettings.Get(ConfigurationKeys.Identifier);
+            var password = ConfigurationManager.AppSettings.Get(ConfigurationKeys.Password);
             if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(identifier) || string.IsNullOrEmpty(password))
                 throw new Exception("Cannot get apiKey, Identifier, Password");
             var request = new RestRequest(EndPoints.Session, Method.Post);

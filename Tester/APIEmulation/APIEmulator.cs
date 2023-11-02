@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Configuration;
 using MoneyMachine.API;
+using MoneyMachine.Constants;
 using MoneyMachine.Entities;
 using MoneyMachine.Enums;
 using MoneyMachine.Interface;
@@ -16,6 +18,7 @@ namespace TestEnv.TestAPI
         private double Balance;
         private Resolution LowerResolution;
         private Resolution UpperResolution;
+        private string ConnectionString;
 
 		public APIEmulator(List<PeriodData> periodDatas, Resolution lowerResolution, Resolution upperResolution)
 		{
@@ -26,7 +29,8 @@ namespace TestEnv.TestAPI
             LowerResolutionIndex = 0;
             UpperResolutionIndex = 0;
             Balance = 1000;
-		}
+            ConnectionString = ConfigurationManager.AppSettings.Get(ConfigurationKeys.ConnectionString);
+        }
 
         public string ClosePosition(string dealId)
         {

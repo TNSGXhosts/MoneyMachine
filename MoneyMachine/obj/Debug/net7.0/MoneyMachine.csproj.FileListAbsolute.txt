@@ -59,3 +59,13 @@
 /Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Microsoft.Extensions.Primitives.dll
 /Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/LumenWorks.Framework.IO.dll
 /Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/NetTrader.Indicator.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Humanizer.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.Abstractions.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.Design.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.Relational.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Microsoft.Extensions.Caching.Abstractions.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Microsoft.Extensions.Caching.Memory.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Microsoft.Extensions.DependencyModel.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/Mono.TextTemplating.dll
+/Users/vitaliikonnov/Projects/MoneyMachine/MoneyMachine/bin/Debug/net7.0/System.CodeDom.dll

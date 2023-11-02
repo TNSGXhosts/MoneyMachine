@@ -1,4 +1,6 @@
 ﻿using System;
+using MoneyMachine.Enums;
+
 namespace MoneyMachine.Constants
 {
     public class ApplicationConstants
@@ -7,6 +9,18 @@ namespace MoneyMachine.Constants
         public const string WebSocketUrl = "wss://api-streaming-capital.backend-capital.com/connect";
 
         public const string DefaultDateFormat = "YYYY-MM-DDTHH:MM:SS";
+
+        public static readonly Dictionary<Resolution, TimeSpan> ResolutionDateTimeMapping = new Dictionary<Resolution, TimeSpan>()
+        {
+            { Resolution.WEEK, new TimeSpan(7, 0, 0) },
+            { Resolution.DAY, new TimeSpan(1, 0, 0, 0) },
+            { Resolution.HOUR_4, new TimeSpan(4, 0, 0) },
+            { Resolution.HOUR, new TimeSpan(1, 0, 0) },
+            { Resolution.MINUTE_30, new TimeSpan(0, 30, 0) },
+            { Resolution.MINUTE_15, new TimeSpan(0, 15, 0) },
+            { Resolution.MINUTE_5, new TimeSpan(0, 5, 0) },
+            { Resolution.MINUTE, new TimeSpan(0, 1, 0) }
+        };
     }
 
     public class Fields
@@ -22,6 +36,15 @@ namespace MoneyMachine.Constants
         public const string ProductPriceChanging = "Product Price Changing";
         public const string BalanceChanging = "Balance Changing";
         public const string PercentSuccessTrades = "Succes %: {0}";
+    }
+
+    public class ConfigurationKeys
+    {
+        public const string ApiKey = "ApiKey";
+        public const string Identifier = "Identifier";
+        public const string Password = "Password";
+        public const string AccountName = "AccountName";
+        public const string ConnectionString = "ConnectionString";
     }
 
     public class EndPoints
