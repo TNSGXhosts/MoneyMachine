@@ -18,6 +18,9 @@ public static class BackgroundWorkersRegistry
         services.AddQuartz(q
             => q.Configure<CapitalTradingInfoCollectorJob>(schedulerSettings.CapitalTradingJobScheduleInterval));
 
+        services.AddQuartz(q
+            => q.Configure<CapitalTradingHandlerJob>(schedulerSettings.CapitalTradingHandlerJobScheduleInterval));
+
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
     }
 

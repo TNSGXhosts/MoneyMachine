@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Trading.Application;
 using Trading.Application.BLL;
 using Trading.Application.DAL;
+using Trading.Application.Presentation;
 using Trading.Application.TelegramIntegration;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -24,13 +25,23 @@ builder.Logging.AddConsole();
 
 using var app = builder.Build();
 
-await RunTelegramBotAsync(app.Services);
+using CancellationTokenSource cts = new ();
+await RunTelegramBotAsync(app.Services, cts);
+RunTradingNotifier(app.Services);
 
 await app.RunAsync();
+
+cts.Cancel();
 return;
 
-async Task RunTelegramBotAsync(IServiceProvider hostProvider)
+async Task RunTelegramBotAsync(IServiceProvider hostProvider, CancellationTokenSource cts)
 {
     var telegramClient = hostProvider.GetRequiredService<ITelegramClient>();
-    await telegramClient.RunAsync();
+    await telegramClient.RunAsync(cts);
+}
+
+void RunTradingNotifier(IServiceProvider hostProvider)
+{
+    var tradingNotifier = hostProvider.GetRequiredService<ITradingNotifier>();
+    tradingNotifier.Subscribe();
 }

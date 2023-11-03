@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Trading.Application.Configuration;
+using Trading.Application.Presentation;
 using Trading.Application.TelegramIntegration;
 
 namespace Trading.Application;
@@ -13,6 +14,7 @@ public static class PresentationRegistry
         ConfigurationRegistry(services, configuration);
 
         services.AddSingleton<ITelegramClient, TelegramClient>();
+        services.AddSingleton<ITradingNotifier, TradingNotifier>();
     }
 
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)

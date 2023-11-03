@@ -2,6 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Trading.Application.BLL.Background;
+using Trading.Application.BLL.Notifications;
+using Trading.Application.BLL.TradingHandler;
 using Trading.Application.BLL.TradingInfoCollector;
 
 namespace Trading.Application.BLL;
@@ -13,6 +15,9 @@ public static class BusinessLogicLayerRegistry
         ConfigurationRegistry(services, configuration);
 
         services.AddTransient<ICapitalTradingInfoProcessor, CapitalTradingInfoProcessor>();
+        services.AddTransient<ICapitalTradingHandlerProcessor, CapitalTradingHandlerProcessor>();
+
+        services.AddSingleton<ITradingNotificationEvents, TradingNotificationEvents>();
 
         services.RegisterBackgroundWorkers(configuration);
     }
