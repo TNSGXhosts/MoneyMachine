@@ -8,13 +8,15 @@ namespace Trading.Application;
 
 public static class PresentationRegistry
 {
-    public static void ConfigurationRegistry(this IServiceCollection services, IConfigurationRoot configuration)
+    public static void RegisterPresentationServices(this IServiceCollection services, IConfigurationRoot configuration)
     {
-        services.Configure<TelegramSettings>(configuration.GetSection(TelegramSettings.ConfigurationSectionName));
+        ConfigurationRegistry(services, configuration);
+
+        services.AddSingleton<ITelegramClient, TelegramClient>();
     }
 
-    public static void RegisterPresentationServices(this IServiceCollection services)
+    private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<ITelegramClient, TelegramClient>();
+        services.Configure<TelegramSettings>(settings => configuration.GetSection(nameof(TelegramSettings)).Bind(settings));
     }
 }

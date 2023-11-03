@@ -8,7 +8,12 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+      <PackageReference Include="Quartz" Version="3.7.0" />
+      <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.7.0" />
+      <PackageReference Include="Quartz.Extensions.Hosting" Version="3.7.0" />
       <PackageReference Include="Roslynator.Analyzers" Version="4.6.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,6 +26,10 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Trading.Application.DAL\Trading.Application.DAL.csproj" />
     </ItemGroup>
 
 </Project>
