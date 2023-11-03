@@ -13,6 +13,8 @@ public static class PresentationRegistry
     {
         ConfigurationRegistry(services, configuration);
 
+        services.AddMemoryCache(options => options.TrackStatistics = true);
+
         services.AddSingleton<ITelegramClient, TelegramClient>();
         services.AddSingleton<ITradingNotifier, TradingNotifier>();
     }
