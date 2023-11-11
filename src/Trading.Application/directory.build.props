@@ -1,0 +1,8 @@
+<Project>
+ <PropertyGroup>
+  <!-- uncomment section below to disable analyzers during build -->
+  <!-- <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild> -->
+  <!-- <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis> -->
+  <!-- <RunAnalyzers>false</RunAnalyzers> -->
+ </PropertyGroup>
+</Project>
