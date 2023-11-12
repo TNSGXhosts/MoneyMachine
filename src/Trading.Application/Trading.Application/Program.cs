@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Trading.Application;
 using Trading.Application.BLL;
 using Trading.Application.DAL;
+using Trading.Application.DAL.Data;
+using Trading.Application.DAL.DataAccess;
 using Trading.Application.Presentation;
 using Trading.Application.TelegramIntegration;
 
@@ -18,16 +21,17 @@ var configuration = new ConfigurationBuilder()
 
 builder.Services.RegisterPresentationServices(configuration);
 builder.Services.RegisterBusinessLogicLayerServices(configuration);
-builder.Services.RegisterDataAccessLayerServices();
+builder.Services.RegisterDataAccessLayerServices(configuration);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 using var app = builder.Build();
 
-using CancellationTokenSource cts = new ();
+using CancellationTokenSource cts = new();
 await RunTelegramBotAsync(app.Services, cts);
 RunTradingNotifier(app.Services);
+GetPriceDataAccess(configuration);
 
 await app.RunAsync();
 
@@ -44,4 +48,13 @@ void RunTradingNotifier(IServiceProvider hostProvider)
 {
     var tradingNotifier = hostProvider.GetRequiredService<ITradingNotifier>();
     tradingNotifier.Subscribe();
+}
+
+void GetPriceDataAccess(IConfigurationRoot configuration)
+{
+    //TODO: string const
+    var connectionString = configuration.GetConnectionString("Sqlite");
+    var dbContext = new DataContext(connectionString);
+    var priceDataAccess = new PriceDataAccess(dbContext);
+    priceDataAccess.TestDb();
 }
