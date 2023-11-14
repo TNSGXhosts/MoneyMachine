@@ -31,7 +31,6 @@ using var app = builder.Build();
 using CancellationTokenSource cts = new();
 await RunTelegramBotAsync(app.Services, cts);
 RunTradingNotifier(app.Services);
-GetPriceDataAccess(configuration);
 
 await app.RunAsync();
 
@@ -48,13 +47,4 @@ void RunTradingNotifier(IServiceProvider hostProvider)
 {
     var tradingNotifier = hostProvider.GetRequiredService<ITradingNotifier>();
     tradingNotifier.Subscribe();
-}
-
-void GetPriceDataAccess(IConfigurationRoot configuration)
-{
-    //TODO: string const
-    var connectionString = configuration.GetConnectionString("Sqlite");
-    var dbContext = new DataContext(connectionString);
-    var priceDataAccess = new PriceDataAccess(dbContext);
-    priceDataAccess.TestDb();
 }

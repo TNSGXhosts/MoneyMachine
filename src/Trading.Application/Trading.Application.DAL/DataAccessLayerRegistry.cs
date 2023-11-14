@@ -20,6 +20,6 @@ public static class DataAccessLayerRegistry
         services.AddDbContext<DataContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("Sqlite")));
 
-        services.AddScoped<IPriceDataAccess, PriceDataAccess>();
+        services.AddScoped<IPriceRepository, PriceRepository>();
     }
 }

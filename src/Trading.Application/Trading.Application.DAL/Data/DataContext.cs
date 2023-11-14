@@ -11,6 +11,12 @@ namespace Trading.Application.DAL.Data
         public DbSet<Price> Prices { get; set; }
         public DbSet<TradingVolumes> TradingVolumes { get; set; }
 
+        public DataContext()
+        {
+            _connectionStrign =
+                "Filename=/Users/vitaliikonnov/Projects/MoneyMachine2/Untitled/src/Trading.Application/Trading.Application.DAL/sqlite.bd";
+        }
+
         public DataContext(string connectionString)
         {
             _connectionStrign = connectionString;

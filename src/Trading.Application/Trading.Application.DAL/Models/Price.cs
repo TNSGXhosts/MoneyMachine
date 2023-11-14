@@ -10,5 +10,7 @@
         public TradingVolumes HighPrice { get; set; }
         public TradingVolumes LowPrice { get; set; }
         public double LastTradedVolume { get; set; }
+        public required string Ticker { get; set; }
+        public required string TimeFrame { get; set; }
     }
 }
