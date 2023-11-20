@@ -4,6 +4,7 @@
     {
         public int PriceId { get; set; }
         public required string SnapshotTime { get; set; }
+        // ReSharper disable once InconsistentNaming
         public required string SnapshotTimeUTC { get; set; }
         public TradingVolumes OpenPrice { get; set; }
         public TradingVolumes ClosePrice { get; set; }

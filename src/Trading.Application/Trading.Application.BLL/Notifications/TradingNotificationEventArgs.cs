@@ -1,8 +1,6 @@
 namespace Trading.Application.BLL.Notifications;
 
-public class TradingNotificationEventArgs : EventArgs
+public class TradingNotificationEventArgs(TradingNotification notification) : EventArgs
 {
-    public TradingNotificationEventArgs(TradingNotification notification) => Notification = notification;
-
-    public TradingNotification Notification { get; }
+    public TradingNotification Notification { get; } = notification;
 }

@@ -10,12 +10,11 @@ using Trading.Application.TelegramIntegration;
 
 namespace Trading.Application.Presentation;
 
-internal class TradingNotifier : ITradingNotifier
+internal class TradingNotifier(ILogger<TradingNotifier> logger,
+        ITradingNotificationEvents tradingNotificationEvents,
+        ITelegramClient telegramClient)
+    : ITradingNotifier
 {
-    private readonly ILogger<TradingNotifier> _logger;
-    private readonly ITradingNotificationEvents _tradingNotificationEvents;
-    private readonly ITelegramClient _telegramClient;
-
     private readonly Dictionary<TradingNotificationType, string> _tradingNotificationMap = new()
     {
         [TradingNotificationType.None] = "None",
@@ -30,23 +29,16 @@ internal class TradingNotifier : ITradingNotifier
         [TradingNotificationDealType.Short] = "SHORT"
     };
 
-    public TradingNotifier(ILogger<TradingNotifier> logger,
-        ITradingNotificationEvents tradingNotificationEvents,
-        ITelegramClient telegramClient)
-    {
-        _logger = logger;
-        _tradingNotificationEvents = tradingNotificationEvents;
-        _telegramClient = telegramClient;
-    }
+    public void Subscribe() => tradingNotificationEvents.TradingNotificationEvent += OnTradingNotificationEvent!;
 
-    public void Subscribe() => _tradingNotificationEvents.TradingNotificationEvent += OnTradingNotificationEvent!;
-
+#pragma warning disable RCS1163
     private void OnTradingNotificationEvent(object sender, TradingNotificationEventArgs e)
+#pragma warning restore RCS1163
     {
         var message = BuildMessage(e);
 
-        _logger.LogInformation("Trading notification event received: {0}", message);
-        AsyncContext.Run(() => _telegramClient.SendMessageAsync(message));
+        logger.LogInformation("Trading notification event received: {0}", message);
+        AsyncContext.Run(() => telegramClient.SendMessageAsync(message));
     }
 
     // TODO : Build message in a better way.

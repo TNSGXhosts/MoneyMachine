@@ -5,17 +5,16 @@ using Trading.Application.BLL.Notifications.Types;
 
 namespace Trading.Application.BLL.TradingHandler;
 
-internal class CapitalTradingHandlerProcessor : ICapitalTradingHandlerProcessor
-{
-    private readonly ILogger<CapitalTradingHandlerProcessor> _logger;
-    private readonly ITradingNotificationEvents _tradingNotificationEvents;
-
-    public CapitalTradingHandlerProcessor(ILogger<CapitalTradingHandlerProcessor> logger,
+internal class CapitalTradingHandlerProcessor(ILogger<CapitalTradingHandlerProcessor> logger,
         ITradingNotificationEvents tradingNotificationEvents)
-    {
-        _logger = logger;
-        _tradingNotificationEvents = tradingNotificationEvents;
-    }
+    : ICapitalTradingHandlerProcessor
+{
+#pragma warning disable CA1823
+    // ReSharper disable once UnusedMember.Local
+#pragma warning disable RCS1213
+    private readonly ILogger<CapitalTradingHandlerProcessor> _logger = logger;
+#pragma warning restore RCS1213
+#pragma warning restore CA1823
 
     public Task ProcessAsync()
     {
@@ -35,7 +34,7 @@ internal class CapitalTradingHandlerProcessor : ICapitalTradingHandlerProcessor
             DealType = (TradingNotificationDealType)notificationTypeDealValues.GetValue(indexDealType)!
         };
         var eventArgs = new TradingNotificationEventArgs(notification);
-        _tradingNotificationEvents.OnTradingNotification(eventArgs);
+        tradingNotificationEvents.OnTradingNotification(eventArgs);
 
         return Task.CompletedTask;
     }
