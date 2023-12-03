@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Trading.Application.Configuration;
+using Trading.Application.Handlers;
 using Trading.Application.Presentation;
 using Trading.Application.TelegramIntegration;
 
@@ -17,6 +18,14 @@ public static class PresentationRegistry
 
         services.AddSingleton<ITelegramClient, TelegramClient>();
         services.AddSingleton<ITradingNotifier, TradingNotifier>();
+
+        var types = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(s => s.GetTypes())
+            .Where(p => typeof(IHandler).IsAssignableFrom(p) && !p.IsInterface);
+        foreach (var t in types)
+        {
+            services.AddScoped(typeof(IHandler), t);
+        }
     }
 
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)

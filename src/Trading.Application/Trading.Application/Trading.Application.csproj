@@ -25,6 +25,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Stateless" Version="5.14.0" />
       <PackageReference Include="Telegram.Bot" Version="19.0.0" />
     </ItemGroup>
 
