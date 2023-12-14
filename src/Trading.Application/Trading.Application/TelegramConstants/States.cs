@@ -4,6 +4,13 @@ public enum States
     {
         Start,
         CreationOrder,
+        CreationPosition,
+        ChoosingOrder,
+        ChoosingPosition,
+        OrderSelected,
+        PositionSelected,
         UpdatingOrder,
-        ChooseOrderToClose,
+        UpdatingPosition,
+        ClosingOrder,
+        ClosingPosition,
     }

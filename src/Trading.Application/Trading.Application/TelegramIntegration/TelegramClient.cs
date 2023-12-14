@@ -7,8 +7,6 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-using Stateless;
-
 using Trading.Application.Configuration;
 using Trading.Application.TelegramConstants;
 
@@ -16,24 +14,26 @@ using Trading.Application.Handlers;
 
 using Telegram.Bot.Types.ReplyMarkups;
 
+using Trading.Application.UserContext;
+
 namespace Trading.Application.TelegramIntegration;
 
-internal class TelegramClient(
-    ILogger<TelegramClient> logger,
+internal class TelegramClient(ILogger<TelegramClient> logger,
     IOptions<TelegramSettings> options,
-    IEnumerable<IHandler> handlers) : ITelegramClient
+    IEnumerable<IHandler> handlers,
+    IUserContext userContext) : ITelegramClient
 {
-    private TelegramBotClient? _botClient;
-    private readonly StateMachine<States, Triggers> _machine = new StateMachine<States, Triggers>(States.Start);
-
-    private int _messageId;
+    private readonly ILogger<TelegramClient> _logger = logger;
     private readonly TelegramSettings _telegramSettings = options.Value;
+    private readonly IEnumerable<IHandler> _handlers = handlers;
+    private readonly IUserContext _userContext = userContext;
+
+    private TelegramBotClient? _botClient;
+    private int _messageId;
 
     public async Task RunAsync(CancellationTokenSource cts)
     {
         _botClient = new TelegramBotClient(_telegramSettings.AccessToken);
-
-        ConfigureStateMachine();
 
         var receiverOptions = new ReceiverOptions
         {
@@ -48,115 +48,116 @@ internal class TelegramClient(
         );
 
         var me = await _botClient.GetMeAsync();
-        logger.LogInformation($"Telegram bot client has started with userID: {me.Id} and bot name is {me.FirstName}.");
+        _logger.LogInformation($"Telegram bot client has started with userID: {me.Id} and bot name is {me.FirstName}.");
     }
 
-    private void ConfigureStateMachine() {
-        _machine.Configure(States.Start).Permit(Triggers.AddOrder, States.CreationOrder);
-        _machine.Configure(States.Start).Permit(Triggers.ChooseToUpdate, States.UpdatingOrder);
-        _machine.Configure(States.Start).Permit(Triggers.ChooseToClose, States.ChooseOrderToClose);
-        _machine.Configure(States.CreationOrder).Permit(Triggers.Start, States.Start);
-        _machine.Configure(States.UpdatingOrder).Permit(Triggers.Start, States.Start);
-        _machine.Configure(States.ChooseOrderToClose).Permit(Triggers.Start, States.Start);
-    }
-
-    public async Task SendMessageAsync(string message)
+    public async Task SendMessageAsync(string message, IReplyMarkup replyMarkup = null)
     {
-        await _botClient?.SendTextMessageAsync(_telegramSettings.ChatId, message)!;
+        await _botClient?.SendTextMessageAsync(_telegramSettings.ChatId, message, replyMarkup: replyMarkup)!;
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         try {
             if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery != null) {
-                HandleCallbackQuery(update.CallbackQuery);
+                await HandleCallbackQueryAsync(update.CallbackQuery);
             }
 
             if (update.Message != null) {
-                HandleMessage(update.Message);
+                await HandleMessageAsync(update.Message);
             }
         } catch(Exception e) {
-            logger.LogError($"{e.Message} - {e.InnerException}");
+            _logger.LogError($"{e.Message} - {e.InnerException}");
         }
     }
 
-    private async void HandleMessage(Message message)
+    private async Task HandleMessageAsync(Message message)
     {
         try {
             if (message.Text != null)
             {
-                if (Enum.TryParse(message.Text, true, out Triggers parsedTrigger) && _machine.State != States.Start)
-                {
-                    _machine.Fire(parsedTrigger);
-                    _messageId = 0;
+                if (_userContext.IsMessageExpected) {
+                    var isSuccess = _userContext.ExecuteUserInputPipeline(message.Text);
+
+                    var keyboardMarkup = new InlineKeyboardMarkup(new []
+                        {
+                            new []
+                            {
+                                InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
+                            }
+                        });
+                    var replyMessage = isSuccess ? "Operation have processed successfully" : "Operation failed";
+
+                    await SendReplyAsync(replyMessage, keyboardMarkup);
                 }
 
-                var handler = handlers.FirstOrDefault(h => h.State == _machine.State);
-                var reply = handler?.HandleMessage(message.Text);
-                if (!string.IsNullOrEmpty(reply?.Item1)){
-                    if (_messageId == 0){
-                        var firstMessage = await _botClient.SendTextMessageAsync(
-                            chatId: _telegramSettings.ChatId,
-                            text: reply.Item1,
-                            replyMarkup: reply.Item2
-                        );
-                        _messageId = firstMessage.MessageId;
-                    } else {
-                        await _botClient.EditMessageTextAsync(
-                            chatId: _telegramSettings.ChatId,
-                            messageId:_messageId,
-                            text: reply.Item1,
-                            replyMarkup: reply.Item2);
-                    }
-                } else {
-                    logger.LogError($"Can't find a handler for: {_machine.State}");
-                }
+                var handler = _handlers.FirstOrDefault(h => h.Trigger == Triggers.Start);
+                var reply = handler?.Handle(message.Text);
+
+                if (!string.IsNullOrEmpty(reply?.Item1)) {
+                    await SendReplyAsync(reply.Item1, reply.Item2);
+            }
             }
         } catch (Exception e) {
-            logger.LogError($"{e.Message} - {e.InnerException}");
+            _logger.LogError($"{e.Message} - {e.InnerException}");
         }
     }
 
-    private async void HandleCallbackQuery(CallbackQuery callbackQuery)
+    private async Task HandleCallbackQueryAsync(CallbackQuery callbackQuery)
     {
-        Tuple<string, InlineKeyboardMarkup> reply;
+        Tuple<string, InlineKeyboardMarkup> reply = null;
         try {
             if (Enum.TryParse(callbackQuery.Data, true, out Triggers parsedTrigger))
             {
-                _machine.Fire(parsedTrigger);
+                _userContext.CatchEvent(parsedTrigger);
 
-                logger.LogInformation($"Parsed trigger: {parsedTrigger}, new state: {_machine.State}");
+                _logger.LogInformation($"Parsed trigger: {parsedTrigger}, new state: {_userContext.State}");
 
-                var handler = handlers.FirstOrDefault(h => h.State == _machine.State);
-                reply = handler?.HandleCallBack(string.Empty);
+                var handler = _handlers.FirstOrDefault(h => h.Trigger == parsedTrigger);
+                //TODO: add handle callback params
+                reply = handler?.Handle(callbackQuery.Data);
             }
-            else
+            else if (_userContext.State != States.Start && _userContext.IsMessageExpected)
             {
-                logger.LogError($"Can't parse callback data as trigger: {callbackQuery.Data} -  used as select");
+                _logger.LogInformation($"Can't parse callback data as trigger: {callbackQuery.Data} -  used as select");
 
-                var handler = handlers.FirstOrDefault(h => h.State == _machine.State);
-                reply = handler?.HandleCallBackSelect(callbackQuery.Data);
+                var isSuccess = _userContext.ExecuteUserInputPipeline(callbackQuery.Data);
+
+                reply = new Tuple<string, InlineKeyboardMarkup>(isSuccess ? "Operation have processed successfully" : "Operation failed",
+                    new InlineKeyboardMarkup(new []
+                    {
+                        new []
+                        {
+                            InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
+                        }
+                    })
+                );
             }
 
             if (!string.IsNullOrEmpty(reply?.Item1)) {
-                if (_messageId == 0) {
+                await SendReplyAsync(reply.Item1, reply.Item2);
+            }
+        } catch(Exception e) {
+            _logger.LogError($"{e.Message} - {e.InnerException}");
+        }
+    }
+
+    private async Task SendReplyAsync(string message, InlineKeyboardMarkup replyMarkup)
+    {
+        if (_messageId == 0) {
                     var firstMessage = await _botClient.SendTextMessageAsync(
                         chatId: _telegramSettings.ChatId,
-                        text: reply.Item1,
-                        replyMarkup: reply.Item2
+                        text: message,
+                        replyMarkup: replyMarkup
                     );
                     _messageId = firstMessage.MessageId;
                 } else {
                     await _botClient.EditMessageTextAsync(
                                 chatId: _telegramSettings.ChatId,
                                 messageId:_messageId,
-                                text: reply.Item1,
-                                replyMarkup: reply.Item2);
+                                text: message,
+                                replyMarkup: replyMarkup);
                 }
-            }
-        } catch(Exception e) {
-            logger.LogError($"{e.Message} - {e.InnerException}");
-        }
     }
 
     private Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
@@ -168,7 +169,7 @@ internal class TelegramClient(
             _ => exception.ToString()
         };
 
-        logger.LogError(errorMessage);
+        _logger.LogError(errorMessage);
         return Task.CompletedTask;
     }
 }

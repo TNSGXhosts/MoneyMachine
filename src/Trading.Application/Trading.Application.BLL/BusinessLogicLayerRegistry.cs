@@ -1,4 +1,6 @@
+using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +12,8 @@ using Nito.AsyncEx;
 using Polly;
 
 using Trading.Application.BLL.Background;
+using Trading.Application.BLL.CapitalIntegration;
+using Trading.Application.BLL.CapitalIntegrationEntities;
 using Trading.Application.BLL.Configuration;
 using Trading.Application.BLL.Notifications;
 using Trading.Application.BLL.TradingHandler;
@@ -28,6 +32,8 @@ public static class BusinessLogicLayerRegistry
 
         services.RegisterBackgroundWorkers(configuration);
         services.RegisterHttpClients();
+
+        services.AddScoped<ICapitalClient, CapitalClient>();
     }
 
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)
@@ -48,7 +54,7 @@ public static class BusinessLogicLayerRegistry
                 var securityToken = cache.Get<string>("capitalSecurityToken");
                 if (string.IsNullOrWhiteSpace(accessToken) || string.IsNullOrWhiteSpace(securityToken))
                 {
-                    var request = new HttpRequestMessage(HttpMethod.Post, capitalIntegrationSettings.BaseUrl + "/session")
+                    var request = new HttpRequestMessage(HttpMethod.Post, capitalIntegrationSettings.BaseUrl + Endpoints.Session)
                     {
                         Headers =
                         {
@@ -64,9 +70,9 @@ public static class BusinessLogicLayerRegistry
                     var response = AsyncContext.Run(() => httpClient.SendAsync(request));
                     response.EnsureSuccessStatusCode();
 
-                    var session = AsyncContext.Run(() => response.Content.ReadFromJsonAsync<CapitalIntegrationSession>());
-                    accessToken = session!.AccessToken;
-                    securityToken = session.SecurityToken;
+                    accessToken = AsyncContext.Run(() => response.Headers.FirstOrDefault(h => h.Key == "CST").Value).FirstOrDefault();
+                    securityToken = AsyncContext.Run(() => response.Headers.FirstOrDefault(h => h.Key == "X-SECURITY-TOKEN").Value)
+                        .FirstOrDefault();
 
                     // TODO : Set expiration time.
                     cache.Set("capitalAccessToken", accessToken, new TimeSpan(1, 0, 0));
@@ -85,7 +91,9 @@ public static class BusinessLogicLayerRegistry
 // TODO : Extract to a separate file.
 public class CapitalIntegrationSession
 {
+    [JsonPropertyName("accessToken")]
     public string AccessToken { get; set; } = string.Empty;
 
+    [JsonPropertyName("securityToken")]
     public string SecurityToken { get; set; } = string.Empty;
 }

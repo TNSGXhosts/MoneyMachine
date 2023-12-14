@@ -5,6 +5,7 @@ using Trading.Application.Configuration;
 using Trading.Application.Handlers;
 using Trading.Application.Presentation;
 using Trading.Application.TelegramIntegration;
+using Trading.Application.UserContext;
 
 namespace Trading.Application;
 
@@ -18,6 +19,8 @@ public static class PresentationRegistry
 
         services.AddSingleton<ITelegramClient, TelegramClient>();
         services.AddSingleton<ITradingNotifier, TradingNotifier>();
+
+        services.AddSingleton<IUserContext, Context>();
 
         var types = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())

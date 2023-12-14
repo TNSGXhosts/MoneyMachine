@@ -3,9 +3,14 @@ namespace Trading.Application.TelegramConstants;
 public enum Triggers
     {
         AddOrder,
-        ChooseToUpdate,
+        AddPosition,
+        ChooseOrder,
+        ChoosePosition,
+        SelectOrder,
+        SelectPosition,
         EditOrder,
-        ChooseToClose,
+        EditPosition,
         CloseOrder,
+        ClosePosition,
         Start
     }
