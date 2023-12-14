@@ -409,3 +409,4 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+src/Trading.Application/Trading.Application/appsettings.json
