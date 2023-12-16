@@ -66,7 +66,7 @@ public class Context : IUserContext
     }
 
     bool IUserContext.IsMessageExpected
-        => _userCallbackData != null && (_machine.State == States.UpdatingPosition || _machine.State == States.UpdatingOrder
+        => _userInputPipeline != null && (_machine.State == States.UpdatingPosition || _machine.State == States.UpdatingOrder
             || _machine.State == States.CreationPosition
             || _machine.State == States.CreationOrder);
 

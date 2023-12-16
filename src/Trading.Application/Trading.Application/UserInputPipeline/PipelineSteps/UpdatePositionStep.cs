@@ -8,10 +8,15 @@ public class UpdatePositionStep(ICapitalClient capitalClient, IUserContext userC
 {
     public bool Execute(string input)
     {
+        if (userContext.OrderData == null)
+        {
+            return false;
+        }
+
         var position = new CreatePositionEntity() {
             Epic = userContext.OrderData.Epic,
             Direction = userContext.OrderData.Direction,
-            Size = (double)userContext.OrderData.Level,
+            Size = userContext.OrderData.Size,
             StopLevel = userContext.OrderData.StopLoss,
             ProfitLevel = userContext.OrderData.TakeProfit
         };

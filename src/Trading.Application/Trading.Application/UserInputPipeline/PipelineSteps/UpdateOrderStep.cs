@@ -8,6 +8,11 @@ public class UpdateOrderStep(ICapitalClient capitalClient, IUserContext userCont
 {
     public bool Execute(string input)
     {
+        if (userContext.OrderData == null || !userContext.OrderData.Level.HasValue)
+        {
+            return false;
+        }
+
         var position = new UpdateOrderEntity() {
             Level = (double)userContext.OrderData.Level,
             StopLevel = userContext.OrderData.StopLoss,

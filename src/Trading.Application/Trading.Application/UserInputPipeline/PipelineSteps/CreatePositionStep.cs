@@ -7,6 +7,11 @@ namespace Trading.Application.UserInputPipeline;
 public class CreatePositionStep(ICapitalClient capitalClient, IUserContext userContext) : IPipelineStep
 {
     public bool Execute(string input) {
+        if (userContext.OrderData == null)
+        {
+            return false;
+        }
+
         var position = new CreatePositionEntity() {
             Epic = userContext.OrderData.Epic,
             Direction = userContext.OrderData.Direction,

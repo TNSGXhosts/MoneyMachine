@@ -77,7 +77,7 @@ internal class TelegramClient(ILogger<TelegramClient> logger,
             if (message.Text != null)
             {
                 if (_userContext.IsMessageExpected) {
-                    var isSuccess = _userContext.ExecuteUserInputPipeline(message.Text);
+                    var hasError = _userContext.ExecuteUserInputPipeline(message.Text);
 
                     var keyboardMarkup = new InlineKeyboardMarkup(new []
                         {
@@ -86,17 +86,27 @@ internal class TelegramClient(ILogger<TelegramClient> logger,
                                 InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                             }
                         });
-                    var replyMessage = isSuccess ? "Operation have processed successfully" : "Operation failed";
+                    var replyMessage = hasError ? "Operation failed" : "Operation have processed successfully";
 
                     await SendReplyAsync(replyMessage, keyboardMarkup);
                 }
 
-                var handler = _handlers.FirstOrDefault(h => h.Trigger == Triggers.Start);
-                var reply = handler?.Handle(message.Text);
+                if (message.Text.Equals(nameof(Triggers.Start), StringComparison.OrdinalIgnoreCase))
+                {
+                    _messageId = 0;
 
-                if (!string.IsNullOrEmpty(reply?.Item1)) {
-                    await SendReplyAsync(reply.Item1, reply.Item2);
-            }
+                    if (_userContext.State != States.Start)
+                    {
+                        _userContext.CatchEvent(Triggers.Start);
+                    }
+
+                    var handler = _handlers.FirstOrDefault(h => h.Trigger == Triggers.Start);
+                    var reply = handler?.Handle(message.Text);
+
+                    if (!string.IsNullOrEmpty(reply?.Item1)) {
+                        await SendReplyAsync(reply.Item1, reply.Item2);
+                    }
+                }
             }
         } catch (Exception e) {
             _logger.LogError($"{e.Message} - {e.InnerException}");
@@ -105,25 +115,25 @@ internal class TelegramClient(ILogger<TelegramClient> logger,
 
     private async Task HandleCallbackQueryAsync(CallbackQuery callbackQuery)
     {
-        Tuple<string, InlineKeyboardMarkup> reply = null;
+        Tuple<string, InlineKeyboardMarkup>? reply = null;
         try {
-            if (Enum.TryParse(callbackQuery.Data, true, out Triggers parsedTrigger))
+            var parsedData = ParseCallbackData(callbackQuery.Data);
+            if (parsedData != null)
             {
-                _userContext.CatchEvent(parsedTrigger);
+                _userContext.CatchEvent(parsedData.Item1);
 
-                _logger.LogInformation($"Parsed trigger: {parsedTrigger}, new state: {_userContext.State}");
+                _logger.LogInformation($"Parsed trigger: {parsedData.Item1}, new state: {_userContext.State}");
 
-                var handler = _handlers.FirstOrDefault(h => h.Trigger == parsedTrigger);
-                //TODO: add handle callback params
-                reply = handler?.Handle(callbackQuery.Data);
+                var handler = _handlers.FirstOrDefault(h => h.Trigger == parsedData.Item1);
+                reply = handler?.Handle(string.IsNullOrEmpty(parsedData.Item2) ? parsedData.Item1.ToString() : parsedData.Item2);
             }
-            else if (_userContext.State != States.Start && _userContext.IsMessageExpected)
+            else if (_userContext.State != States.Start)
             {
                 _logger.LogInformation($"Can't parse callback data as trigger: {callbackQuery.Data} -  used as select");
 
-                var isSuccess = _userContext.ExecuteUserInputPipeline(callbackQuery.Data);
+                var hasError = _userContext.ExecuteUserInputPipeline(callbackQuery.Data);
 
-                reply = new Tuple<string, InlineKeyboardMarkup>(isSuccess ? "Operation have processed successfully" : "Operation failed",
+                reply = new Tuple<string, InlineKeyboardMarkup>(hasError ? "Operation failed" : "Operation have processed successfully",
                     new InlineKeyboardMarkup(new []
                     {
                         new []
@@ -140,6 +150,18 @@ internal class TelegramClient(ILogger<TelegramClient> logger,
         } catch(Exception e) {
             _logger.LogError($"{e.Message} - {e.InnerException}");
         }
+    }
+
+    private Tuple<Triggers, string>? ParseCallbackData(string data)
+    {
+        const int paramenersMaxLength = 2;
+        var parameters = data.Split('-');
+
+        if (Enum.TryParse(parameters[0], true, out Triggers parsedTrigger) && parameters.Length <= paramenersMaxLength) {
+            return new Tuple<Triggers, string>(parsedTrigger, parameters.Length > 1 ? parameters[1] : string.Empty);
+        }
+
+        return null;
     }
 
     private async Task SendReplyAsync(string message, InlineKeyboardMarkup replyMarkup)

@@ -1,19 +1,14 @@
-using Trading.Application.BLL.CapitalIntegrationEntities;
+using Microsoft.Extensions.Logging;
+
 using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
 
-public class ParseTradeUpdateStep(IUserContext userContext) : IPipelineStep
+public class ParseTradeUpdateStep(IUserContext userContext, ILogger<ParseTradeUpdateStep> logger) : IPipelineStep
 {
     public bool Execute(string input)
     {
-        //TODO: validate input
         string[] lines = input.Split('\n');
-
-        if (lines.Length == 3 || lines.Length == 4)
-        {
-            return false;
-        }
 
         try{
             var isOrder = lines.Length == 3;
@@ -26,6 +21,8 @@ public class ParseTradeUpdateStep(IUserContext userContext) : IPipelineStep
         }
         catch
         {
+            logger.LogError($"Can't parse input: {input}");
+
             return false;
         }
 

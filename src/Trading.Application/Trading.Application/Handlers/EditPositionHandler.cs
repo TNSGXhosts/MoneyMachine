@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 using Telegram.Bot.Types.ReplyMarkups;
 
 using Trading.Application.BLL.CapitalIntegration;
@@ -8,7 +10,7 @@ using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application.Handlers;
 
-internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext userContext) : IHandler
+internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext userContext, ILogger<ParseTradeUpdateStep> logger) : IHandler
 {
     public Triggers Trigger => Triggers.EditOrder;
 
@@ -18,7 +20,7 @@ internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext us
         {
             UserContext = userContext,
             PipelineSteps = new List<IPipelineStep>(){
-                new ParseTradeUpdateStep(userContext),
+                new ParseTradeUpdateStep(userContext, logger),
                 new UpdatePositionStep(capitalClient, userContext),
             }
         };
