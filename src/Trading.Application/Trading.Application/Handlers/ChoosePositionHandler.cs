@@ -17,7 +17,7 @@ internal class ChoosePositionHandler(ICapitalClient capitalClient) : IHandler
             .Select(
                 o => InlineKeyboardButton.WithCallbackData(
                     $"{o.Market.Epic}-{o.Position.Level}",
-                    $"{nameof(Triggers.SelectOrder)}-{o.Position.DealId}"))
+                    $"{nameof(Triggers.SelectPosition)}{ParserConstants.ParserConstants.Separator}{o.Position.DealId}"))
             .ToList();
         var buttonLines = new List<List<InlineKeyboardButton>>();
         for (int i = 0; i < keyboardButtons.Count; i += 4)

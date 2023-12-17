@@ -14,11 +14,9 @@ public class UpdatePositionStep(ICapitalClient capitalClient, IUserContext userC
         }
 
         var position = new CreatePositionEntity() {
-            Epic = userContext.OrderData.Epic,
-            Direction = userContext.OrderData.Direction.ToString(),
-            Size = userContext.OrderData.Size,
             StopLevel = userContext.OrderData.StopLoss,
-            ProfitLevel = userContext.OrderData.TakeProfit
+            ProfitLevel = userContext.OrderData.TakeProfit,
+            //GuaranteedStop = userContext.OrderData.StopLoss != 0 || userContext.OrderData.TakeProfit != 0
         };
 
         return capitalClient.UpdatePosition(userContext.InputCallback, position).Result;

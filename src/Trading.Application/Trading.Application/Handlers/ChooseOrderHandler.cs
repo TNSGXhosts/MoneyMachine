@@ -18,7 +18,7 @@ internal class ChooseOrderHandler(ICapitalClient capitalClient, IUserContext use
             .Select(
                 o => InlineKeyboardButton.WithCallbackData(
                     $"{o.MarketData.Epic}-{o.WorkingOrderData.OrderLevel}",
-                    $"{nameof(Triggers.SelectOrder)}-{o.WorkingOrderData.DealId}"))
+                    $"{nameof(Triggers.SelectOrder)}{ParserConstants.ParserConstants.Separator}{o.WorkingOrderData.DealId}"))
             .ToList();
 
         var buttonLines = new List<List<InlineKeyboardButton>>();

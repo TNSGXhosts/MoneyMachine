@@ -12,7 +12,7 @@ namespace Trading.Application.Handlers;
 
 internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext userContext, ILogger<ParseTradeUpdateStep> logger) : IHandler
 {
-    public Triggers Trigger => Triggers.EditOrder;
+    public Triggers Trigger => Triggers.EditPosition;
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
@@ -27,7 +27,6 @@ internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext us
 
         return new Tuple<string, InlineKeyboardMarkup>(
             @"Enter new Position info:
-            Level - 20
             Stop loss - optional
             Take profit - optional",
             new InlineKeyboardMarkup(new []

@@ -17,8 +17,8 @@ public class ParseTradeUpdateStep(IUserContext userContext, ILogger<ParseTradeUp
             userContext.OrderData = new TradeData
             {
                 Level = isOrder ? decimal.Parse(lines[0]) : null,
-                StopLoss = hasStoploss ? decimal.Parse(lines[isOrder ? 1 : 0]) : 0,
-                TakeProfit = hasTakeprofit ? decimal.Parse(lines[isOrder ? 2 : 1]) : 0
+                StopLoss = hasStoploss ? decimal.Parse(lines[isOrder ? 1 : 0]) : null,
+                TakeProfit = hasTakeprofit ? decimal.Parse(lines[isOrder ? 2 : 1]) : null
             };
         }
         catch

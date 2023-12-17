@@ -156,7 +156,7 @@ internal class TelegramClient(ILogger<TelegramClient> logger,
     private Tuple<Triggers, string>? ParseCallbackData(string data)
     {
         const int paramenersMaxLength = 2;
-        var parameters = data.Split('-');
+        var parameters = data.Split(ParserConstants.ParserConstants.Separator);
 
         if (Enum.TryParse(parameters[0], true, out Triggers parsedTrigger) && parameters.Length <= paramenersMaxLength) {
             return new Tuple<Triggers, string>(parsedTrigger, parameters.Length > 1 ? parameters[1] : string.Empty);

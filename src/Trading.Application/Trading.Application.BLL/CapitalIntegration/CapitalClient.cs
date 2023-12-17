@@ -74,13 +74,15 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
 
             var options = new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
             };
             var request = new HttpRequestMessage(HttpMethod.Put, string.Concat(_capitalSettings.BaseUrl, Endpoints.WorkOrders, "/", dealId))
             {
                 Content = JsonContent.Create(updateOrderEntity, options: options)
             };
 
+            var tmp = await request.Content.ReadAsStringAsync();
             var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
@@ -139,13 +141,15 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
 
             var options = new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
             };
             var request = new HttpRequestMessage(HttpMethod.Put, string.Concat(_capitalSettings.BaseUrl, Endpoints.Positions, "/", dealId))
             {
                 Content = JsonContent.Create(updatePositionEntity, options: options)
             };
 
+            var con = await request.Content.ReadAsStringAsync();
             var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
