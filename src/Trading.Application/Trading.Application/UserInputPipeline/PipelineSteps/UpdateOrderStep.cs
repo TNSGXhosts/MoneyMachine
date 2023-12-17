@@ -19,6 +19,6 @@ public class UpdateOrderStep(ICapitalClient capitalClient, IUserContext userCont
             ProfitLevel = userContext.OrderData.TakeProfit
         };
 
-        return capitalClient.UpdateOrder(input, position).Result;
+        return capitalClient.UpdateOrder(userContext.InputCallback, position).Result;
     }
 }

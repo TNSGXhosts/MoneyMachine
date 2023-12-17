@@ -89,6 +89,8 @@ public class Context : IUserContext
 
         HasPipelineError = false;
         _userInputPipeline = null;
+        _userMessage = string.Empty;
+        _userCallbackData = string.Empty;
 
         return hasPipelineError;
     }

@@ -16,7 +16,9 @@ internal class ChooseOrderHandler(ICapitalClient capitalClient, IUserContext use
         var orders = capitalClient.GetOrders();
         var keyboardButtons = orders.Result
             .Select(
-                o => InlineKeyboardButton.WithCallbackData(o.MarketData.Epic, $"{nameof(Triggers.SelectOrder)}-{o.WorkingOrderData.Epic}"))
+                o => InlineKeyboardButton.WithCallbackData(
+                    o.MarketData.Epic,
+                    $"{nameof(Triggers.SelectOrder)}-{o.WorkingOrderData.DealId}"))
             .ToList();
         keyboardButtons.Add(InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)));
         var keyboardMarkup = new InlineKeyboardMarkup(new []{ keyboardButtons });

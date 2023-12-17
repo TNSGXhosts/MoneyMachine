@@ -71,9 +71,14 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
     public async Task<bool> UpdateOrder(string dealId, UpdateOrderEntity updateOrderEntity) {
         try {
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            };
             var request = new HttpRequestMessage(HttpMethod.Put, string.Concat(_capitalSettings.BaseUrl, Endpoints.WorkOrders, "/", dealId))
             {
-                Content = JsonContent.Create(updateOrderEntity)
+                Content = JsonContent.Create(updateOrderEntity, options: options)
             };
 
             var response = await httpClient.SendAsync(request);
@@ -131,9 +136,14 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
     public async Task<bool> UpdatePosition(string dealId, UpdatePositionEntity updatePositionEntity) {
         try {
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            };
             var request = new HttpRequestMessage(HttpMethod.Put, string.Concat(_capitalSettings.BaseUrl, Endpoints.Positions, "/", dealId))
             {
-                Content = JsonContent.Create(updatePositionEntity)
+                Content = JsonContent.Create(updatePositionEntity, options: options)
             };
 
             var response = await httpClient.SendAsync(request);

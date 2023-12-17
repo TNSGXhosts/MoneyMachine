@@ -14,7 +14,6 @@ public class ParseTradeUpdateStep(IUserContext userContext, ILogger<ParseTradeUp
         var hasTakeprofit = (isOrder && lines.Length >= 3) || (!isOrder && lines.Length >= 2);
 
         try {
-            var isOrder = lines.Length == 3;
             userContext.OrderData = new TradeData
             {
                 Level = isOrder ? double.Parse(lines[0]) : null,
