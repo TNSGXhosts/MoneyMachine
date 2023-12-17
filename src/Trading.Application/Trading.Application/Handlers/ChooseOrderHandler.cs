@@ -17,11 +17,19 @@ internal class ChooseOrderHandler(ICapitalClient capitalClient, IUserContext use
         var keyboardButtons = orders.Result
             .Select(
                 o => InlineKeyboardButton.WithCallbackData(
-                    o.MarketData.Epic,
+                    $"{o.MarketData.Epic}-{o.WorkingOrderData.OrderLevel}",
                     $"{nameof(Triggers.SelectOrder)}-{o.WorkingOrderData.DealId}"))
             .ToList();
-        keyboardButtons.Add(InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)));
-        var keyboardMarkup = new InlineKeyboardMarkup(new []{ keyboardButtons });
+
+        var buttonLines = new List<List<InlineKeyboardButton>>();
+        for (int i = 0; i < keyboardButtons.Count; i += 4)
+        {
+            var subArray = keyboardButtons.GetRange(i, Math.Min(4, keyboardButtons.Count - i));
+            buttonLines.Add(subArray);
+        }
+
+        buttonLines.Add(new List<InlineKeyboardButton>() { InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)) });
+        var keyboardMarkup = new InlineKeyboardMarkup(buttonLines);
 
         return new Tuple<string, InlineKeyboardMarkup>(
             "Choose an order:",

@@ -15,11 +15,19 @@ internal class ChoosePositionHandler(ICapitalClient capitalClient) : IHandler
         var positions = capitalClient.GetPositions();
         var keyboardButtons = positions.Result
             .Select(
-                o => InlineKeyboardButton.WithCallbackData(o.Market.Epic, $"{nameof(Triggers.SelectOrder)}-{o.Position.DealId}"))
+                o => InlineKeyboardButton.WithCallbackData(
+                    $"{o.Market.Epic}-{o.Position.Level}",
+                    $"{nameof(Triggers.SelectOrder)}-{o.Position.DealId}"))
             .ToList();
-        keyboardButtons.Add(InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)));
+        var buttonLines = new List<List<InlineKeyboardButton>>();
+        for (int i = 0; i < keyboardButtons.Count; i += 4)
+        {
+            var subArray = keyboardButtons.GetRange(i, Math.Min(4, keyboardButtons.Count - i));
+            buttonLines.Add(subArray);
+        }
 
-        var keyboardMarkup = new InlineKeyboardMarkup(new [] { keyboardButtons });
+        buttonLines.Add(new List<InlineKeyboardButton>() { InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)) });
+        var keyboardMarkup = new InlineKeyboardMarkup(buttonLines);
 
         return new Tuple<string, InlineKeyboardMarkup>(
             "Choose a position:",

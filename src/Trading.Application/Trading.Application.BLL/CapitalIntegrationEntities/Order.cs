@@ -16,8 +16,8 @@ public class WorkingOrderData
     public required string DealId { get; set; }
     public required string Direction { get; set; }
     public required string Epic { get; set; }
-    public int OrderSize { get; set; }
-    public int OrderLevel { get; set; }
+    public double OrderSize { get; set; }
+    public double OrderLevel { get; set; }
     public required string TimeInForce { get; set; }
     public DateTime GoodTillDate { get; set; }
     public DateTime GoodTillDateUTC { get; set; }
@@ -25,8 +25,8 @@ public class WorkingOrderData
     public DateTime CreatedDateUTC { get; set; }
     public bool GuaranteedStop { get; set; }
     public required string OrderType { get; set; }
-    public int StopDistance { get; set; }
-    public int ProfitDistance { get; set; }
+    public double StopDistance { get; set; }
+    public double ProfitDistance { get; set; }
     public string CurrencyCode { get; set; }
 }
 

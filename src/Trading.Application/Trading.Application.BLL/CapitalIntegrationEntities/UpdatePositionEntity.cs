@@ -5,10 +5,10 @@ public class UpdatePositionEntity {
     public bool GuaranteedStop { get;set; }
     //Must be true if a trailing stop is required
     public bool TrailingStop { get;set; }
-    public double StopLevel { get;set; }
-    public double StopDistance { get;set; }
-    public double StopAmount { get;set; }
-    public double ProfitLevel { get;set; }
-    public double ProfitDistance { get;set; }
-    public double ProfitAmount { get;set; }
+    public decimal StopLevel { get;set; }
+    public decimal StopDistance { get;set; }
+    public decimal StopAmount { get;set; }
+    public decimal ProfitLevel { get;set; }
+    public decimal ProfitDistance { get;set; }
+    public decimal ProfitAmount { get;set; }
 }

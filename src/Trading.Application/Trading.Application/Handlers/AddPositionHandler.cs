@@ -26,7 +26,12 @@ internal class AddPositionHandler(IUserContext userContext, ICapitalClient capit
         };
 
         return new Tuple<string, InlineKeyboardMarkup>(
-            "Enter Position Info: ticker, direction, size, stop loss, take profit",
+            @"Enter Position Info:
+            Ticker - 'SILVER'
+            Direction - BUY/SELL
+            Size - 1
+            Stop loss - optional
+            Take profit - optional",
              new InlineKeyboardMarkup(new[]
                 {
                     new []

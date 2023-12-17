@@ -26,7 +26,13 @@ internal class AddOrderHandler(IUserContext userContext, ICapitalClient capitalC
         };
 
         return new Tuple<string, InlineKeyboardMarkup>(
-            "Enter Order Info: ticker, direction, size, level, stop loss, take profit",
+            @"Enter Order Info:
+            Ticker - 'SILVER'
+            Direction - BUY/SELL
+            Size - 1
+            Level - 20
+            Stop loss - optional
+            Take profit - optional",
              new InlineKeyboardMarkup(new[]
                 {
                     new []

@@ -27,7 +27,10 @@ internal class EditOrderHandler(ICapitalClient capitalClient, IUserContext userC
         };
 
         return new Tuple<string, InlineKeyboardMarkup>(
-            "Enter new Order info: level, stop loss, take profit",
+            @"Enter new Order info:
+            Level - 20
+            Stop loss - optional
+            Take profit - optional",
             new InlineKeyboardMarkup(new []
             {
                 new []

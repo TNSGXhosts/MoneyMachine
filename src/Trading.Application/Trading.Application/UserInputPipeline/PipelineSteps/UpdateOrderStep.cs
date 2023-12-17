@@ -14,7 +14,7 @@ public class UpdateOrderStep(ICapitalClient capitalClient, IUserContext userCont
         }
 
         var position = new UpdateOrderEntity() {
-            Level = (double)userContext.OrderData.Level,
+            Level = (decimal)userContext.OrderData.Level,
             StopLevel = userContext.OrderData.StopLoss,
             ProfitLevel = userContext.OrderData.TakeProfit
         };
