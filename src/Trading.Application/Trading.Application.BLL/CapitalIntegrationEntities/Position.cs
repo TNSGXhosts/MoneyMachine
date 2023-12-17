@@ -8,7 +8,9 @@ public class Position
     public required string DealId { get; set; }
     public required string DealReference { get; set; }
     public required string WorkingOrderId { get; set; }
-    public double Size { get; set; }
+    public decimal Size { get; set; }
+    public decimal StopLevel { get;set; }
+    public decimal ProfitLevel { get;set; }
     public int Leverage { get; set; }
     public double Upl { get; set; }
     public required string Direction { get; set; }

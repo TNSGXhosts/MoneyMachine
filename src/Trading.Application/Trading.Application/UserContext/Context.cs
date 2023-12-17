@@ -1,7 +1,8 @@
 using Stateless;
 
+using Trading.Application.BLL.CapitalIntegrationEntities;
+
 using Trading.Application.TelegramConstants;
-using Trading.Application.TelegramIntegration;
 using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application.UserContext;
@@ -13,6 +14,8 @@ public class Context : IUserContext
     private string _userCallbackData;
     private TradeData _orderData;
     private InputPipeline _userInputPipeline;
+    private PositionData _positionData;
+    private WorkingOrder _workingOrder;
 
     public bool HasPipelineError { get; set; }
 
@@ -74,6 +77,18 @@ public class Context : IUserContext
     {
         get => _userInputPipeline;
         set => _userInputPipeline = value;
+    }
+
+    public PositionData PositionData
+    {
+        get => _positionData;
+        set => _positionData = value;
+    }
+
+    public WorkingOrder WorkingOrder
+    {
+        get => _workingOrder;
+        set => _workingOrder = value;
     }
 
     public void CatchEvent(Triggers trigger)

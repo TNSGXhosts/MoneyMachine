@@ -1,4 +1,4 @@
-using Telegram.Bot.Types.ReplyMarkups;
+using Trading.Application.BLL.CapitalIntegrationEntities;
 
 using Trading.Application.TelegramConstants;
 
@@ -15,6 +15,8 @@ public interface IUserContext
     public InputPipeline UserInputPipeline { get;set; }
     public bool HasPipelineError { get;set; }
     public bool IsMessageExpected { get; }
+    public PositionData PositionData { get;set; }
+    public WorkingOrder WorkingOrder { get;set; }
 
     public bool ExecuteUserInputPipeline(string input);
     public void CatchEvent(Triggers trigger);

@@ -26,9 +26,9 @@ internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext us
         };
 
         return new Tuple<string, InlineKeyboardMarkup>(
-            @"Enter new Position info:
-            Stop loss - optional
-            Take profit - optional",
+            @$"Enter new Position info:
+            Stop loss - {userContext.PositionData.Position.StopLevel}
+            Take profit - {userContext.PositionData.Position.ProfitLevel}",
             new InlineKeyboardMarkup(new []
             {
                 new []
