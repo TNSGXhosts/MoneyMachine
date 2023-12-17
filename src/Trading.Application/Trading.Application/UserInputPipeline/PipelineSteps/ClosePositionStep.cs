@@ -6,6 +6,6 @@ public class ClosePositionStep(ICapitalClient capitalClient) : IPipelineStep
 {
     public bool Execute(string input)
     {
-        return capitalClient.ClosePosition(input);
+        return capitalClient.ClosePosition(input).Result;
     }
 }

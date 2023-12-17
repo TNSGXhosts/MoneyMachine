@@ -1,10 +1,9 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
 
 using Microsoft.Extensions.Options;
-
-using Nito.AsyncEx;
 
 using Trading.Application.BLL.CapitalIntegrationEntities;
 using Trading.Application.BLL.Configuration;
@@ -17,37 +16,51 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
 {
     private readonly CapitalIntegrationSettings _capitalSettings = capitalIntegrationSettings.Value;
 
-    public bool CreatePosition(CreatePositionEntity createPositionEntity) {
-        try {
+    public async Task<bool> CreatePosition(CreatePositionEntity createPositionEntity)
+    {
+        try
+        {
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            };
             var request = new HttpRequestMessage(HttpMethod.Post, string.Concat(_capitalSettings.BaseUrl, Endpoints.Positions))
             {
-                Content = JsonContent.Create(createPositionEntity)
+                Content = JsonContent.Create(createPositionEntity, options: options)
             };
 
-            var response = AsyncContext.Run(() => httpClient.SendAsync(request));
+            var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
-            var createPositionResult = AsyncContext.Run(() => response.Content.ReadFromJsonAsync<BaseResponse>());
+            var createPositionResult = await response.Content.ReadFromJsonAsync<BaseResponse>();
             return string.IsNullOrEmpty(createPositionResult?.ErrorCode);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             logger.LogError($"{e.Message} - {e.InnerException}");
             return false;
         }
     }
 
-    public bool CreateOrder(CreateOrderEntity createOrderEntity) {
+    public async Task<bool> CreateOrder(CreateOrderEntity createOrderEntity) {
         try {
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            };
             var request = new HttpRequestMessage(HttpMethod.Post, string.Concat(_capitalSettings.BaseUrl, Endpoints.WorkOrders))
             {
-                Content = JsonContent.Create(createOrderEntity)
+                Content = JsonContent.Create(createOrderEntity, options: options)
             };
 
-            var response = AsyncContext.Run(() => httpClient.SendAsync(request));
+            var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
-            var createOrderResult = AsyncContext.Run(() => response.Content.ReadFromJsonAsync<BaseResponse>());
+            var createOrderResult = await response.Content.ReadFromJsonAsync<BaseResponse>();
             return string.IsNullOrEmpty(createOrderResult?.ErrorCode);
         } catch (Exception e) {
             logger.LogError($"{e.Message} - {e.InnerException}");
@@ -55,7 +68,7 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
         }
     }
 
-    public bool UpdateOrder(string dealId, UpdateOrderEntity updateOrderEntity) {
+    public async Task<bool> UpdateOrder(string dealId, UpdateOrderEntity updateOrderEntity) {
         try {
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
             var request = new HttpRequestMessage(HttpMethod.Put, string.Concat(_capitalSettings.BaseUrl, Endpoints.WorkOrders, "/", dealId))
@@ -63,10 +76,10 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
                 Content = JsonContent.Create(updateOrderEntity)
             };
 
-            var response = AsyncContext.Run(() => httpClient.SendAsync(request));
+            var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
-            var updateOrderResult = AsyncContext.Run(() => response.Content.ReadFromJsonAsync<BaseResponse>());
+            var updateOrderResult = await response.Content.ReadFromJsonAsync<BaseResponse>();
             return string.IsNullOrEmpty(updateOrderResult?.ErrorCode);
         } catch (Exception e) {
             logger.LogError($"{e.Message} - {e.InnerException}");
@@ -74,17 +87,17 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
         }
     }
 
-    public bool ClosePosition(string dealId) {
+    public async Task<bool> ClosePosition(string dealId) {
         try {
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
             var request = new HttpRequestMessage(
                 HttpMethod.Delete,
                 string.Concat(_capitalSettings.BaseUrl, Endpoints.Positions, "/", dealId));
 
-            var response = AsyncContext.Run(() => httpClient.SendAsync(request));
+            var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
-            var cancelPositionResult = AsyncContext.Run(() => response.Content.ReadFromJsonAsync<BaseResponse>());
+            var cancelPositionResult = await response.Content.ReadFromJsonAsync<BaseResponse>();
             return string.IsNullOrEmpty(cancelPositionResult?.ErrorCode);
         } catch (Exception e) {
             logger.LogError($"{e.Message} - {e.InnerException}");
@@ -92,25 +105,30 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
         }
     }
 
-    public bool CloseOrder(string dealId) {
-        try {
+    public async Task<bool> CloseOrder(string dealId)
+    {
+        try
+        {
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
             var request = new HttpRequestMessage(
                 HttpMethod.Delete,
                 string.Concat(_capitalSettings.BaseUrl, Endpoints.WorkOrders, "/", dealId));
 
-            var response = AsyncContext.Run(() => httpClient.SendAsync(request));
+            var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
-            var cancelOrderResult = AsyncContext.Run(() => response.Content.ReadFromJsonAsync<BaseResponse>());
+            var cancelOrderResult = await response.Content.ReadFromJsonAsync<BaseResponse>();
+
             return string.IsNullOrEmpty(cancelOrderResult?.ErrorCode);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             logger.LogError($"{e.Message} - {e.InnerException}");
             return false;
         }
     }
 
-    public bool UpdatePosition(string dealId, UpdatePositionEntity updatePositionEntity) {
+    public async Task<bool> UpdatePosition(string dealId, UpdatePositionEntity updatePositionEntity) {
         try {
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
             var request = new HttpRequestMessage(HttpMethod.Put, string.Concat(_capitalSettings.BaseUrl, Endpoints.Positions, "/", dealId))
@@ -118,14 +136,46 @@ public class CapitalClient(IOptions<CapitalIntegrationSettings> capitalIntegrati
                 Content = JsonContent.Create(updatePositionEntity)
             };
 
-            var response = AsyncContext.Run(() => httpClient.SendAsync(request));
+            var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
-            var createPositionResult = AsyncContext.Run(() => response.Content.ReadFromJsonAsync<BaseResponse>());
+            var createPositionResult = await response.Content.ReadFromJsonAsync<BaseResponse>(cancellationToken: CancellationToken.None);
             return string.IsNullOrEmpty(createPositionResult?.ErrorCode);
         } catch (Exception e) {
             logger.LogError($"{e.Message} - {e.InnerException}");
             return false;
+        }
+    }
+
+    public async Task<IEnumerable<PositionData>> GetPositions() {
+        try {
+            var httpClient = httpClientFactory.CreateClient("capitalIntegration");
+            var request = new HttpRequestMessage(HttpMethod.Get, string.Concat(_capitalSettings.BaseUrl, Endpoints.Positions));
+
+            var response = await httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<PositionsResponse>();
+            return result?.Positions ?? [];
+        } catch (Exception e) {
+            logger.LogError($"{e.Message} - {e.InnerException}");
+            return new List<PositionData>();
+        }
+    }
+
+    public async Task<IEnumerable<WorkingOrder>> GetOrders() {
+        try {
+            var httpClient = httpClientFactory.CreateClient("capitalIntegration");
+            var request = new HttpRequestMessage(HttpMethod.Get, string.Concat(_capitalSettings.BaseUrl, Endpoints.WorkOrders));
+
+            var response = await httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<WorkingOrderResponce>();
+            return result?.WorkingOrders ?? [];
+        } catch (Exception e) {
+            logger.LogError($"{e.Message} - {e.InnerException}");
+            return new List<WorkingOrder>();
         }
     }
 }

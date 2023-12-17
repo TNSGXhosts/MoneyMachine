@@ -6,6 +6,6 @@ public class CloseOrderStep(ICapitalClient capitalClient) : IPipelineStep
 {
     public bool Execute(string input)
     {
-        return capitalClient.CloseOrder(input);
+        return capitalClient.CloseOrder(input).Result;
     }
 }

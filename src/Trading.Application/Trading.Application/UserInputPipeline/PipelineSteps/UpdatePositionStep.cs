@@ -15,12 +15,12 @@ public class UpdatePositionStep(ICapitalClient capitalClient, IUserContext userC
 
         var position = new CreatePositionEntity() {
             Epic = userContext.OrderData.Epic,
-            Direction = userContext.OrderData.Direction,
+            Direction = userContext.OrderData.Direction.ToString(),
             Size = userContext.OrderData.Size,
             StopLevel = userContext.OrderData.StopLoss,
             ProfitLevel = userContext.OrderData.TakeProfit
         };
 
-        return capitalClient.UpdatePosition(input, position);
+        return capitalClient.UpdatePosition(input, position).Result;
     }
 }

@@ -20,7 +20,7 @@ internal class AddPositionHandler(IUserContext userContext, ICapitalClient capit
         {
             UserContext = userContext,
             PipelineSteps = new List<IPipelineStep>(){
-                new ParseTradeCreationStep(userContext, logger),
+                new ParseTradeCreationStep(userContext, logger, false),
                 new CreatePositionStep(capitalClient, userContext),
             }
         };

@@ -21,7 +21,7 @@ internal class EditOrderHandler(ICapitalClient capitalClient, IUserContext userC
         {
             UserContext = userContext,
             PipelineSteps = new List<IPipelineStep>(){
-                new ParseTradeUpdateStep(userContext, logger),
+                new ParseTradeUpdateStep(userContext, logger, true),
                 new UpdateOrderStep(capitalClient, userContext),
             }
         };

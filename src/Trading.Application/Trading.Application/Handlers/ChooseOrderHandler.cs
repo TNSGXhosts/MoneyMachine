@@ -1,26 +1,25 @@
 using Telegram.Bot.Types.ReplyMarkups;
 
+using Trading.Application.BLL.CapitalIntegration;
+
 using Trading.Application.TelegramConstants;
+using Trading.Application.UserContext;
 
 namespace Trading.Application.Handlers;
 
-internal class ChooseOrderHandler : IHandler
+internal class ChooseOrderHandler(ICapitalClient capitalClient, IUserContext userContext) : IHandler
 {
     public Triggers Trigger => Triggers.ChooseOrder;
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        //TODO: get orders from brocker
-        var keyboardMarkup = new InlineKeyboardMarkup(new []
-        {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData("USDCHF", $"{nameof(Triggers.SelectOrder)}-123"),
-                InlineKeyboardButton.WithCallbackData("EURUSD", $"{nameof(Triggers.SelectOrder)}-321"),
-                InlineKeyboardButton.WithCallbackData("USDCAD", $"{nameof(Triggers.SelectOrder)}-142"),
-                InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
-            }
-        });
+        var orders = capitalClient.GetOrders();
+        var keyboardButtons = orders.Result
+            .Select(
+                o => InlineKeyboardButton.WithCallbackData(o.MarketData.Epic, $"{nameof(Triggers.SelectOrder)}-{o.WorkingOrderData.Epic}"))
+            .ToList();
+        keyboardButtons.Add(InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)));
+        var keyboardMarkup = new InlineKeyboardMarkup(new []{ keyboardButtons });
 
         return new Tuple<string, InlineKeyboardMarkup>(
             "Choose an order:",

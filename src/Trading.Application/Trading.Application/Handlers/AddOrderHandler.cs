@@ -20,7 +20,7 @@ internal class AddOrderHandler(IUserContext userContext, ICapitalClient capitalC
         {
             UserContext = userContext,
             PipelineSteps = new List<IPipelineStep>(){
-                new ParseTradeCreationStep(userContext, logger),
+                new ParseTradeCreationStep(userContext, logger, true),
                 new CreateOrderStep(capitalClient, userContext),
             }
         };

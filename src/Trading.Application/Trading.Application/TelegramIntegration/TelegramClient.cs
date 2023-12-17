@@ -88,6 +88,7 @@ internal class TelegramClient(ILogger<TelegramClient> logger,
                         });
                     var replyMessage = hasError ? "Operation failed" : "Operation have processed successfully";
 
+                    _messageId = 0;
                     await SendReplyAsync(replyMessage, keyboardMarkup);
                 }
 

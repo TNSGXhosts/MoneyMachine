@@ -14,13 +14,15 @@ public class CreateOrderStep(ICapitalClient capitalClient, IUserContext userCont
 
         var order = new CreateOrderEntity() {
             Epic = userContext.OrderData.Epic,
-            Direction = userContext.OrderData.Direction,
+            Direction = userContext.OrderData.Direction.ToString(),
             Size = userContext.OrderData.Size,
             Level = (double)userContext.OrderData.Level,
+            GuaranteedStop = userContext.OrderData.StopLoss != 0,
             StopLevel = userContext.OrderData.StopLoss,
-            ProfitLevel = userContext.OrderData.TakeProfit
+            ProfitLevel = userContext.OrderData.TakeProfit,
+            Type = Types.LIMIT
         };
 
-        return capitalClient.CreateOrder(order);
+        return capitalClient.CreateOrder(order).Result;
     }
 }
