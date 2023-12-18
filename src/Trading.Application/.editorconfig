@@ -536,3 +536,6 @@ dotnet_naming_rule.locals_should_be_camel_case.style = camel_case
 dotnet_naming_rule.local_functions_should_be_pascal_case.severity = error
 dotnet_naming_rule.local_functions_should_be_pascal_case.symbols = local_functions
 dotnet_naming_rule.local_functions_should_be_pascal_case.style = pascal_case
+
+# IDE0058: Expression value is never used
+csharp_style_unused_value_expression_statement_preference = unused_local_variable

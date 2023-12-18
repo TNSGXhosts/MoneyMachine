@@ -171,14 +171,15 @@ internal class TelegramClient(ILogger<TelegramClient> logger,
                     var firstMessage = await _botClient.SendTextMessageAsync(
                         chatId: _telegramSettings.ChatId,
                         text: message,
-                        replyMarkup: replyMarkup
-                    );
+                        parseMode: ParseMode.Markdown,
+                        replyMarkup: replyMarkup);
                     _messageId = firstMessage.MessageId;
                 } else {
                     await _botClient.EditMessageTextAsync(
                                 chatId: _telegramSettings.ChatId,
                                 messageId:_messageId,
                                 text: message,
+                                parseMode: ParseMode.Markdown,
                                 replyMarkup: replyMarkup);
                 }
     }

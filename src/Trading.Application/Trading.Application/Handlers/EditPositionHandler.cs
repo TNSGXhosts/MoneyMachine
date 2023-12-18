@@ -26,9 +26,7 @@ internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext us
         };
 
         return new Tuple<string, InlineKeyboardMarkup>(
-            @$"Enter new Position info:
-            Stop loss - {userContext.PositionData.Position.StopLevel}
-            Take profit - {userContext.PositionData.Position.ProfitLevel}",
+            GetMessage(),
             new InlineKeyboardMarkup(new []
             {
                 new []
@@ -36,5 +34,14 @@ internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext us
                     InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                 }
             }));
+    }
+
+    private string GetMessage()
+    {
+        var message = "Enter new Position info: Take profit, Stop loss";
+        message = string.Concat(message, Environment.NewLine, $"`{userContext.PositionData.Position.StopLevel}");
+        message = string.Concat(message, Environment.NewLine, $"{userContext.PositionData.Position.ProfitLevel}`");
+
+        return message;
     }
 }

@@ -27,10 +27,7 @@ internal class EditOrderHandler(ICapitalClient capitalClient, IUserContext userC
         };
 
         return new Tuple<string, InlineKeyboardMarkup>(
-            @$"Enter new Order info:
-            Level - {userContext.WorkingOrder.WorkingOrderData.OrderLevel}
-            Stop loss - {userContext.WorkingOrder.WorkingOrderData.StopDistance}
-            Take profit - {userContext.WorkingOrder.WorkingOrderData.ProfitDistance}",
+            GetMessage(),
             new InlineKeyboardMarkup(new []
             {
                 new []
@@ -38,5 +35,16 @@ internal class EditOrderHandler(ICapitalClient capitalClient, IUserContext userC
                     InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                 }
             }));
+    }
+
+    private string GetMessage()
+    {
+        var message = "Enter new Order info:";
+        message = string.Concat(message, Environment.NewLine, "Order Level, Stop Distance, Profit Distance");
+        message = string.Concat(message, Environment.NewLine, $"`{userContext.WorkingOrder.WorkingOrderData.OrderLevel}");
+        message = string.Concat(message, Environment.NewLine, $"{userContext.WorkingOrder.WorkingOrderData.StopDistance}");
+        message = string.Concat(message, Environment.NewLine, $"{userContext.WorkingOrder.WorkingOrderData.ProfitDistance}`");
+
+        return message;
     }
 }
