@@ -45,4 +45,6 @@ In future versions of the project, we plan to add the following features:
 
 - Generate reports with deal statistics.
 - Add integration with a second broker.
+- Auto Calculation order size depending on % risk
+- Trade Statistic
 - Algorithmic trading strategy.
