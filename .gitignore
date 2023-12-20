@@ -406,3 +406,6 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+src/Trading.Application/.vscode/launch.json
+src/Trading.Application/.vscode/tasks.json
+src/Trading.Application/Trading.Application/appsettings.json
