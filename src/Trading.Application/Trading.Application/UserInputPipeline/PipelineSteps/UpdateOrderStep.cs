@@ -17,7 +17,6 @@ public class UpdateOrderStep(ICapitalClient capitalClient, IUserContext userCont
             Level = (decimal)userContext.OrderData.Level,
             StopLevel = userContext.OrderData.StopLoss,
             ProfitLevel = userContext.OrderData.TakeProfit,
-            //GuaranteedStop = userContext.OrderData.StopLoss != 0 || userContext.OrderData.TakeProfit != 0
         };
 
         return capitalClient.UpdateOrder(userContext.InputCallback, position).Result;

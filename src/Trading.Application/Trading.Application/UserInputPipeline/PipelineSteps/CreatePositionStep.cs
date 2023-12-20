@@ -16,7 +16,6 @@ public class CreatePositionStep(ICapitalClient capitalClient, IUserContext userC
             Epic = userContext.OrderData.Epic,
             Direction = userContext.OrderData.Direction.ToString(),
             Size = userContext.OrderData.Size,
-            //GuaranteedStop = userContext.OrderData.StopLoss != 0 || userContext.OrderData.TakeProfit != 0,
             StopLevel = userContext.OrderData.StopLoss,
             ProfitLevel = userContext.OrderData.TakeProfit
         };

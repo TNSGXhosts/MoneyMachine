@@ -17,7 +17,6 @@ public class CreateOrderStep(ICapitalClient capitalClient, IUserContext userCont
             Direction = userContext.OrderData.Direction.ToString(),
             Size = userContext.OrderData.Size,
             Level = userContext.OrderData.Level,
-            //GuaranteedStop = userContext.OrderData.StopLoss != 0 || userContext.OrderData.TakeProfit != 0,
             StopLevel = userContext.OrderData.StopLoss,
             ProfitLevel = userContext.OrderData.TakeProfit,
             Type = Types.LIMIT

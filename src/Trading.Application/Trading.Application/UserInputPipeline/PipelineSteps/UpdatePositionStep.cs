@@ -16,7 +16,6 @@ public class UpdatePositionStep(ICapitalClient capitalClient, IUserContext userC
         var position = new CreatePositionEntity() {
             StopLevel = userContext.OrderData.StopLoss,
             ProfitLevel = userContext.OrderData.TakeProfit,
-            //GuaranteedStop = userContext.OrderData.StopLoss != 0 || userContext.OrderData.TakeProfit != 0
         };
 
         return capitalClient.UpdatePosition(userContext.InputCallback, position).Result;
