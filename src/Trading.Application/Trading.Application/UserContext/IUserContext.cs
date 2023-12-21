@@ -1,5 +1,4 @@
-using Trading.Application.BLL.CapitalIntegrationEntities;
-
+using Trading.Application.BLL.CapitalIntegration.Models;
 using Trading.Application.TelegramConstants;
 
 using Trading.Application.UserInputPipeline;

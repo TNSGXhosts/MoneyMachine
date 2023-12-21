@@ -12,7 +12,7 @@ internal class ChoosePositionHandler(ICapitalClient capitalClient) : IHandler
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        var positions = capitalClient.GetPositions();
+        var positions = capitalClient.GetPositionsAsync();
         var keyboardButtons = positions.Result
             .Select(
                 o => InlineKeyboardButton.WithCallbackData(
@@ -20,7 +20,7 @@ internal class ChoosePositionHandler(ICapitalClient capitalClient) : IHandler
                     $"{nameof(Triggers.SelectPosition)}{ParserConstants.ParserConstants.Separator}{o.Position.DealId}"))
             .ToList();
         var buttonLines = new List<List<InlineKeyboardButton>>();
-        for (int i = 0; i < keyboardButtons.Count; i += 4)
+        for (var i = 0; i < keyboardButtons.Count; i += 4)
         {
             var subArray = keyboardButtons.GetRange(i, Math.Min(4, keyboardButtons.Count - i));
             buttonLines.Add(subArray);

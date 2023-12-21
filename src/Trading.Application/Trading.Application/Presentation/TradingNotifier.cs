@@ -31,9 +31,7 @@ internal class TradingNotifier(ILogger<TradingNotifier> logger,
 
     public void Subscribe() => tradingNotificationEvents.TradingNotificationEvent += OnTradingNotificationEvent!;
 
-#pragma warning disable RCS1163
     private void OnTradingNotificationEvent(object sender, TradingNotificationEventArgs e)
-#pragma warning restore RCS1163
     {
         var message = BuildMessage(e);
 

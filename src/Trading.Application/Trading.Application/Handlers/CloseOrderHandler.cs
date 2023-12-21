@@ -12,7 +12,7 @@ public class CloseOrderHandler(ICapitalClient capitalClient, IUserContext userCo
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        var isSuccess = capitalClient.CloseOrder(userContext.InputCallback).Result;
+        var isSuccess = capitalClient.CloseOrderAsync(userContext.InputCallback).Result;
         userContext.InputCallback = string.Empty;
 
         return new Tuple<string, InlineKeyboardMarkup>(

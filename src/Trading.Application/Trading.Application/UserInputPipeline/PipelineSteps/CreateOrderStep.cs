@@ -1,18 +1,21 @@
 using Trading.Application.BLL.CapitalIntegration;
-using Trading.Application.BLL.CapitalIntegrationEntities;
+using Trading.Application.BLL.CapitalIntegration.Enums;
+using Trading.Application.BLL.CapitalIntegration.Models;
 using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
 
 public class CreateOrderStep(ICapitalClient capitalClient, IUserContext userContext) : IPipelineStep
 {
-    public bool Execute(string input) {
+    public bool Execute(string input)
+    {
         if (userContext.OrderData == null || !userContext.OrderData.Level.HasValue)
         {
             return false;
         }
 
-        var order = new CreateOrderEntity() {
+        var order = new CreateOrderRequestModel
+        {
             Epic = userContext.OrderData.Epic,
             Direction = userContext.OrderData.Direction.ToString(),
             Size = userContext.OrderData.Size,
@@ -22,6 +25,6 @@ public class CreateOrderStep(ICapitalClient capitalClient, IUserContext userCont
             Type = Types.LIMIT
         };
 
-        return capitalClient.CreateOrder(order).Result;
+        return capitalClient.CreateOrderAsync(order).Result;
     }
 }

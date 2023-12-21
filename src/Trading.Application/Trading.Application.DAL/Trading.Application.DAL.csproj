@@ -38,7 +38,7 @@
       <None Remove="DataAccess\" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Models\" />
+      <Folder Include="Entities\" />
       <Folder Include="Data\" />
       <Folder Include="DataAccess\" />
     </ItemGroup>

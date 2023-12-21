@@ -15,7 +15,7 @@ internal class SelectPositionHandler(IUserContext userContext, ICapitalClient ca
     {
         userContext.InputCallback = userInput;
 
-        userContext.PositionData = capitalClient.GetPositions().Result.First(p => p.Position.DealId == userInput);
+        userContext.PositionData = capitalClient.GetPositionsAsync().Result.First(p => p.Position.DealId == userInput);
 
         return new Tuple<string, InlineKeyboardMarkup>(
             "Choose an action:",

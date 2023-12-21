@@ -1,4 +1,6 @@
-namespace Trading.Application.BLL.CapitalIntegrationEntities;
+namespace Trading.Application.BLL.CapitalIntegration.Models;
+
+// TODO : Refactor file.
 
 public class WorkingOrderResponce
 {

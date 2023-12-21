@@ -15,7 +15,7 @@ internal class SelectOrderHandler(IUserContext userContext, ICapitalClient capit
     {
         userContext.InputCallback = userInput;
 
-        userContext.WorkingOrder = capitalClient.GetOrders().Result.First(o => o.WorkingOrderData.DealId == userInput);
+        userContext.WorkingOrder = capitalClient.GetOrdersAsync().Result.First(o => o.WorkingOrderData.DealId == userInput);
 
         return new Tuple<string, InlineKeyboardMarkup>(
             "Choose an action:",

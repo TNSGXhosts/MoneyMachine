@@ -8,7 +8,7 @@ using Trading.Application.DAL.Data;
 
 namespace Trading.Application.DAL.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(TradingDbContext))]
     partial class DataContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

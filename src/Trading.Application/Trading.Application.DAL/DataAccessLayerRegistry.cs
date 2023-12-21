@@ -17,7 +17,7 @@ public static class DataAccessLayerRegistry
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)
     {
         //TODO: use string const
-        services.AddDbContext<DataContext>(options =>
+        services.AddDbContext<TradingDbContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("Sqlite")));
 
         services.AddScoped<IPriceRepository, PriceRepository>();

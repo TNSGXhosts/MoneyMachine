@@ -9,7 +9,7 @@ using Trading.Application.DAL.Data;
 
 namespace Trading.Application.DAL.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(TradingDbContext))]
     [Migration("20231112162836_InitialCreate")]
     partial class InitialCreate
     {

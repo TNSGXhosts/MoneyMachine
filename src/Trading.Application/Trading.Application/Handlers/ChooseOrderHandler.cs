@@ -13,7 +13,7 @@ internal class ChooseOrderHandler(ICapitalClient capitalClient, IUserContext use
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        var orders = capitalClient.GetOrders();
+        var orders = capitalClient.GetOrdersAsync();
         var keyboardButtons = orders.Result
             .Select(
                 o => InlineKeyboardButton.WithCallbackData(
@@ -23,7 +23,7 @@ internal class ChooseOrderHandler(ICapitalClient capitalClient, IUserContext use
             .ToList();
 
         var buttonLines = new List<List<InlineKeyboardButton>>();
-        for (int i = 0; i < keyboardButtons.Count; i += 4)
+        for (var i = 0; i < keyboardButtons.Count; i += 4)
         {
             var subArray = keyboardButtons.GetRange(i, Math.Min(4, keyboardButtons.Count - i));
             buttonLines.Add(subArray);

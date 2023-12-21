@@ -12,7 +12,7 @@ public class ClosePositionHandler(ICapitalClient capitalClient, IUserContext use
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        var isSuccess = capitalClient.ClosePosition(userContext.InputCallback).Result;
+        var isSuccess = capitalClient.ClosePositionAsync(userContext.InputCallback).Result;
         userContext.InputCallback = string.Empty;
 
         return new Tuple<string, InlineKeyboardMarkup>(

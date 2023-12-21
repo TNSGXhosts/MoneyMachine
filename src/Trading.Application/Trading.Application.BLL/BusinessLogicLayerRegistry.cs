@@ -1,6 +1,4 @@
-using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +11,6 @@ using Polly;
 
 using Trading.Application.BLL.Background;
 using Trading.Application.BLL.CapitalIntegration;
-using Trading.Application.BLL.CapitalIntegrationEntities;
 using Trading.Application.BLL.Configuration;
 using Trading.Application.BLL.Notifications;
 using Trading.Application.BLL.TradingHandler;
@@ -47,6 +44,7 @@ public static class BusinessLogicLayerRegistry
         // TODO : Do something with strings.
         services.AddHttpClient("capitalIntegration", (serviceProvider, httpClient) =>
             {
+                // TODO : Extract to a separate file. Too much code here.
                 var cache = serviceProvider.GetRequiredService<IMemoryCache>();
                 var capitalIntegrationSettings = serviceProvider.GetRequiredService<IOptions<CapitalIntegrationSettings>>().Value;
 
@@ -54,7 +52,8 @@ public static class BusinessLogicLayerRegistry
                 var securityToken = cache.Get<string>("capitalSecurityToken");
                 if (string.IsNullOrWhiteSpace(accessToken) || string.IsNullOrWhiteSpace(securityToken))
                 {
-                    var request = new HttpRequestMessage(HttpMethod.Post, capitalIntegrationSettings.BaseUrl + Endpoints.Session)
+                    var request = new HttpRequestMessage(HttpMethod.Post,
+                        capitalIntegrationSettings.BaseUrl + CapitalIntegrationEndpoints.Session)
                     {
                         Headers =
                         {
@@ -86,14 +85,4 @@ public static class BusinessLogicLayerRegistry
             .AddTransientHttpErrorPolicy(p
                 => p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromMilliseconds(300 * retryAttempt)));
     }
-}
-
-// TODO : Extract to a separate file.
-public class CapitalIntegrationSession
-{
-    [JsonPropertyName("accessToken")]
-    public string AccessToken { get; set; } = string.Empty;
-
-    [JsonPropertyName("securityToken")]
-    public string SecurityToken { get; set; } = string.Empty;
 }

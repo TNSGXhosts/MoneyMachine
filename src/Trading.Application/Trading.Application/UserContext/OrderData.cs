@@ -1,7 +1,8 @@
-using Trading.Application.BLL.CapitalIntegrationEntities;
+using Trading.Application.BLL.CapitalIntegration.Enums;
 
 namespace Trading.Application.UserContext;
 
+// Why is it here? Do something with it
 public class TradeData {
     public string Epic { get;set; }
     public Directions Direction { get;set; }

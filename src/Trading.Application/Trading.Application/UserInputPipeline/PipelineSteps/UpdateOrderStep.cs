@@ -1,5 +1,5 @@
 using Trading.Application.BLL.CapitalIntegration;
-using Trading.Application.BLL.CapitalIntegrationEntities;
+using Trading.Application.BLL.CapitalIntegration.Models;
 using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
@@ -13,12 +13,13 @@ public class UpdateOrderStep(ICapitalClient capitalClient, IUserContext userCont
             return false;
         }
 
-        var position = new UpdateOrderEntity() {
+        var position = new UpdateOrderRequestModel
+        {
             Level = (decimal)userContext.OrderData.Level,
             StopLevel = userContext.OrderData.StopLoss,
             ProfitLevel = userContext.OrderData.TakeProfit,
         };
 
-        return capitalClient.UpdateOrder(userContext.InputCallback, position).Result;
+        return capitalClient.UpdateOrderAsync(userContext.InputCallback, position).Result;
     }
 }

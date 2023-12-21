@@ -1,18 +1,20 @@
 using Trading.Application.BLL.CapitalIntegration;
-using Trading.Application.BLL.CapitalIntegrationEntities;
+using Trading.Application.BLL.CapitalIntegration.Models;
 using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
 
 public class CreatePositionStep(ICapitalClient capitalClient, IUserContext userContext) : IPipelineStep
 {
-    public bool Execute(string input) {
+    public bool Execute(string input)
+    {
         if (userContext.OrderData == null)
         {
             return false;
         }
 
-        var position = new CreatePositionEntity() {
+        var position = new CreatePositionRequestModel
+        {
             Epic = userContext.OrderData.Epic,
             Direction = userContext.OrderData.Direction.ToString(),
             Size = userContext.OrderData.Size,
@@ -20,6 +22,6 @@ public class CreatePositionStep(ICapitalClient capitalClient, IUserContext userC
             ProfitLevel = userContext.OrderData.TakeProfit
         };
 
-        return capitalClient.CreatePosition(position).Result;
+        return capitalClient.CreatePositionAsync(position).Result;
     }
 }

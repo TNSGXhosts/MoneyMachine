@@ -20,8 +20,18 @@ public static class PresentationRegistry
         services.AddSingleton<ITelegramClient, TelegramClient>();
         services.AddSingleton<ITradingNotifier, TradingNotifier>();
 
-        services.AddSingleton<IUserContext, Context>();
+        services.AddSingleton<IUserContext, UserContext.UserContext>();
 
+        RegisterHandlers(services);
+    }
+
+    private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<TelegramSettings>(settings => configuration.GetSection(nameof(TelegramSettings)).Bind(settings));
+    }
+
+    private static void RegisterHandlers(IServiceCollection services)
+    {
         var types = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())
             .Where(p => typeof(IHandler).IsAssignableFrom(p) && !p.IsInterface);
@@ -29,10 +39,5 @@ public static class PresentationRegistry
         {
             services.AddScoped(typeof(IHandler), t);
         }
-    }
-
-    private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<TelegramSettings>(settings => configuration.GetSection(nameof(TelegramSettings)).Bind(settings));
     }
 }

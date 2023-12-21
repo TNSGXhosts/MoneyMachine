@@ -1,13 +1,14 @@
 using Stateless;
 
-using Trading.Application.BLL.CapitalIntegrationEntities;
-
+using Trading.Application.BLL.CapitalIntegration.Models;
 using Trading.Application.TelegramConstants;
 using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application.UserContext;
 
-public class Context : IUserContext
+// TODO : Refactor it as soon as possible it shouldn't become a god object!
+
+public class UserContext : IUserContext
 {
     private readonly StateMachine<States, Triggers> _machine = new StateMachine<States, Triggers>(States.Start);
     private string _userMessage;
@@ -19,7 +20,7 @@ public class Context : IUserContext
 
     public bool HasPipelineError { get; set; }
 
-    public Context() {
+    public UserContext() {
         _machine.Configure(States.Start).Permit(Triggers.AddOrder, States.CreationOrder);
         _machine.Configure(States.Start).Permit(Triggers.AddPosition, States.CreationPosition);
         _machine.Configure(States.Start).Permit(Triggers.ChooseOrder, States.ChoosingOrder);

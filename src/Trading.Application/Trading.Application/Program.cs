@@ -1,18 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Trading.Application;
 using Trading.Application.BLL;
-using Trading.Application.BLL.CapitalIntegration;
 using Trading.Application.DAL;
-using Trading.Application.DAL.Data;
-using Trading.Application.DAL.DataAccess;
 using Trading.Application.Presentation;
 using Trading.Application.TelegramIntegration;
-using Trading.Application.UserContext;
 
 var builder = Host.CreateApplicationBuilder(args);
 
