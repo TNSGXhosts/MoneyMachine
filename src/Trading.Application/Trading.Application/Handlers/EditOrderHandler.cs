@@ -11,7 +11,7 @@ using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application.Handlers;
 
-internal class EditOrderHandler(ICapitalClient capitalClient, IUserContext userContext, ILogger<ParseTradeUpdateStep> logger) : IHandler
+internal class EditOrderHandler(IOrderClient orderClient, IUserContext userContext, ILogger<ParseTradeUpdateStep> logger) : IHandler
 {
     public Triggers Trigger => Triggers.EditOrder;
 
@@ -22,7 +22,7 @@ internal class EditOrderHandler(ICapitalClient capitalClient, IUserContext userC
             UserContext = userContext,
             PipelineSteps = new List<IPipelineStep>(){
                 new ParseTradeUpdateStep(userContext, logger, true),
-                new UpdateOrderStep(capitalClient, userContext),
+                new UpdateOrderStep(orderClient, userContext),
             }
         };
 

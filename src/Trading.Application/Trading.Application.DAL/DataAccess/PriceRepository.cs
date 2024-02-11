@@ -18,11 +18,10 @@ namespace Trading.Application.DAL.DataAccess
                 .ToListAsync();
         }
 
-        public void SavePrices(List<PriceEntity> prices)
+        public async Task SavePrices(List<PriceEntity> prices)
         {
-            // Why is it not save changes ?
-            // TODO : make it async
             tradingDbContext.AddRange(prices);
+            await tradingDbContext.SaveChangesAsync();
         }
     }
 }

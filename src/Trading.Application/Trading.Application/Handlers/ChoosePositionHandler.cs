@@ -6,13 +6,13 @@ using Trading.Application.TelegramConstants;
 
 namespace Trading.Application.Handlers;
 
-internal class ChoosePositionHandler(ICapitalClient capitalClient) : IHandler
+internal class ChoosePositionHandler(IPositionClient positionClient) : IHandler
 {
     public Triggers Trigger => Triggers.ChoosePosition;
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        var positions = capitalClient.GetPositionsAsync();
+        var positions = positionClient.GetPositionsAsync();
         var keyboardButtons = positions.Result
             .Select(
                 o => InlineKeyboardButton.WithCallbackData(

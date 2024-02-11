@@ -30,7 +30,8 @@ public static class BusinessLogicLayerRegistry
         services.RegisterBackgroundWorkers(configuration);
         services.RegisterHttpClients();
 
-        services.AddScoped<ICapitalClient, CapitalClient>();
+        services.AddScoped<IOrderClient, OrderClient>();
+        services.AddScoped<IPositionClient, PositionClient>();
     }
 
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)

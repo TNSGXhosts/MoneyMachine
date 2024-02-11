@@ -6,6 +6,6 @@ namespace Trading.Application.DAL.DataAccess
     {
         Task<IEnumerable<PriceEntity>> GetPricesAsync(string ticker, string timeframe, DateTime from, DateTime to);
 
-        void SavePrices(List<PriceEntity> prices);
+        Task SavePrices(List<PriceEntity> prices);
     }
 }

@@ -4,7 +4,7 @@ using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
 
-public class UpdateOrderStep(ICapitalClient capitalClient, IUserContext userContext) : IPipelineStep
+public class UpdateOrderStep(IOrderClient capitalClient, IUserContext userContext) : IPipelineStep
 {
     public bool Execute(string input)
     {

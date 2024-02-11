@@ -10,7 +10,10 @@ using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application.Handlers;
 
-internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext userContext, ILogger<ParseTradeUpdateStep> logger) : IHandler
+internal class EditPositionHandler(
+    IPositionClient positionClient,
+    IUserContext userContext,
+    ILogger<ParseTradeUpdateStep> logger) : IHandler
 {
     public Triggers Trigger => Triggers.EditPosition;
 
@@ -21,7 +24,7 @@ internal class EditPositionHandler(ICapitalClient capitalClient, IUserContext us
             UserContext = userContext,
             PipelineSteps = new List<IPipelineStep>(){
                 new ParseTradeUpdateStep(userContext, logger, false),
-                new UpdatePositionStep(capitalClient, userContext),
+                new UpdatePositionStep(positionClient, userContext),
             }
         };
 

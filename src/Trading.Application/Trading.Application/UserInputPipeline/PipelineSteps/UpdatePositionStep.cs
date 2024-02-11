@@ -5,7 +5,7 @@ using Trading.Application.UserContext;
 // TODO : Fix namespace for all pipeline steps
 namespace Trading.Application.UserInputPipeline;
 
-public class UpdatePositionStep(ICapitalClient capitalClient, IUserContext userContext) : IPipelineStep
+public class UpdatePositionStep(IPositionClient positionClient, IUserContext userContext) : IPipelineStep
 {
     public bool Execute(string input)
     {
@@ -20,6 +20,6 @@ public class UpdatePositionStep(ICapitalClient capitalClient, IUserContext userC
             ProfitLevel = userContext.OrderData.TakeProfit,
         };
 
-        return capitalClient.UpdatePositionAsync(userContext.InputCallback, position).Result;
+        return positionClient.UpdatePositionAsync(userContext.InputCallback, position).Result;
     }
 }

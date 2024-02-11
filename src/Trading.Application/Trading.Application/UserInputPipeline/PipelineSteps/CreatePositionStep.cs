@@ -4,7 +4,7 @@ using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
 
-public class CreatePositionStep(ICapitalClient capitalClient, IUserContext userContext) : IPipelineStep
+public class CreatePositionStep(IPositionClient positionClient, IUserContext userContext) : IPipelineStep
 {
     public bool Execute(string input)
     {
@@ -22,6 +22,6 @@ public class CreatePositionStep(ICapitalClient capitalClient, IUserContext userC
             ProfitLevel = userContext.OrderData.TakeProfit
         };
 
-        return capitalClient.CreatePositionAsync(position).Result;
+        return positionClient.CreatePositionAsync(position).Result;
     }
 }

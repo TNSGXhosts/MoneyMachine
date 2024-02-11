@@ -6,13 +6,13 @@ using Trading.Application.UserContext;
 
 namespace Trading.Application.Handlers;
 
-public class ClosePositionHandler(ICapitalClient capitalClient, IUserContext userContext) : IHandler
+public class ClosePositionHandler(IPositionClient positionClient, IUserContext userContext) : IHandler
 {
     Triggers IHandler.Trigger => Triggers.ClosePosition;
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        var isSuccess = capitalClient.ClosePositionAsync(userContext.InputCallback).Result;
+        var isSuccess = positionClient.ClosePositionAsync(userContext.InputCallback).Result;
         userContext.InputCallback = string.Empty;
 
         return new Tuple<string, InlineKeyboardMarkup>(

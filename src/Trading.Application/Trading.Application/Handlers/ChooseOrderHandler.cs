@@ -7,13 +7,13 @@ using Trading.Application.UserContext;
 
 namespace Trading.Application.Handlers;
 
-internal class ChooseOrderHandler(ICapitalClient capitalClient, IUserContext userContext) : IHandler
+internal class ChooseOrderHandler(IOrderClient orderClient, IUserContext userContext) : IHandler
 {
     public Triggers Trigger => Triggers.ChooseOrder;
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        var orders = capitalClient.GetOrdersAsync();
+        var orders = orderClient.GetOrdersAsync();
         var keyboardButtons = orders.Result
             .Select(
                 o => InlineKeyboardButton.WithCallbackData(

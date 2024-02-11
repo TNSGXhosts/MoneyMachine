@@ -7,7 +7,7 @@ using Trading.Application.UserContext;
 
 namespace Trading.Application.Handlers;
 
-internal class SelectOrderHandler(IUserContext userContext, ICapitalClient capitalClient) : IHandler
+internal class SelectOrderHandler(IUserContext userContext, IOrderClient orderClient) : IHandler
 {
     public Triggers Trigger => Triggers.SelectOrder;
 
@@ -15,7 +15,7 @@ internal class SelectOrderHandler(IUserContext userContext, ICapitalClient capit
     {
         userContext.InputCallback = userInput;
 
-        userContext.WorkingOrder = capitalClient.GetOrdersAsync().Result.First(o => o.WorkingOrderData.DealId == userInput);
+        userContext.WorkingOrder = orderClient.GetOrdersAsync().Result.First(o => o.WorkingOrderData.DealId == userInput);
 
         return new Tuple<string, InlineKeyboardMarkup>(
             "Choose an action:",

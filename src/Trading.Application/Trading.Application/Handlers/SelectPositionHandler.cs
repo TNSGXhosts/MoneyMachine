@@ -7,7 +7,7 @@ using Trading.Application.UserContext;
 
 namespace Trading.Application.Handlers;
 
-internal class SelectPositionHandler(IUserContext userContext, ICapitalClient capitalClient) : IHandler
+internal class SelectPositionHandler(IUserContext userContext, IPositionClient positionClient) : IHandler
 {
     public Triggers Trigger => Triggers.SelectPosition;
 
@@ -15,7 +15,7 @@ internal class SelectPositionHandler(IUserContext userContext, ICapitalClient ca
     {
         userContext.InputCallback = userInput;
 
-        userContext.PositionData = capitalClient.GetPositionsAsync().Result.First(p => p.Position.DealId == userInput);
+        userContext.PositionData = positionClient.GetPositionsAsync().Result.First(p => p.Position.DealId == userInput);
 
         return new Tuple<string, InlineKeyboardMarkup>(
             "Choose an action:",
