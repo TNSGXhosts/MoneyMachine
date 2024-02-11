@@ -1,32 +1,17 @@
-using Microsoft.Extensions.Logging;
-
 using Telegram.Bot.Types.ReplyMarkups;
 
-using Trading.Application.BLL.CapitalIntegration;
-
 using Trading.Application.TelegramConstants;
-using Trading.Application.UserContext;
 using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application.Handlers;
 
-internal class AddPositionHandler(
-    IUserContext userContext,
-    IPositionClient positionClient,
-    ILogger<ParseTradeCreationStep> logger) : IHandler
+internal class AddPositionHandler(IUserInputPipelineBuilder userInputPipelineBuilder) : IHandler
 {
     public Triggers Trigger => Triggers.AddPosition;
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        userContext.UserInputPipeline = new InputPipeline()
-        {
-            UserContext = userContext,
-            PipelineSteps = new List<IPipelineStep>(){
-                new ParseTradeCreationStep(userContext, logger, false),
-                new CreatePositionStep(positionClient, userContext),
-            }
-        };
+        userInputPipelineBuilder.BuildAddPositionPipeline();
 
         return new Tuple<string, InlineKeyboardMarkup>(
             @"Enter Position Info:

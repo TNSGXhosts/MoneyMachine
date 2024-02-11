@@ -6,6 +6,7 @@ using Trading.Application.Handlers;
 using Trading.Application.Presentation;
 using Trading.Application.TelegramIntegration;
 using Trading.Application.UserContext;
+using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application;
 
@@ -20,12 +21,15 @@ public static class PresentationRegistry
         services.AddSingleton<ITelegramClient, TelegramClient>();
         services.AddSingleton<ITradingNotifier, TradingNotifier>();
 
+        services.AddSingleton<IStateProcessor, StateProcessor>();
         services.AddSingleton<IUserContext, UserContext.UserContext>();
 
         services.AddScoped<IMessageHandler, MessageHandler>();
         services.AddScoped<ICallbackHandler, CallbackHandler>();
         services.AddScoped<ICallbackParser, CallbackParser>();
         services.AddScoped<ITelegramContext, TelegramContext>();
+        services.AddScoped<IUserInputPipelineBuilder, UserInputPipelineBuilder>();
+        services.AddScoped<IUserInputPipelineContext, UserInputPipelineContext>();
 
         RegisterHandlers(services);
     }

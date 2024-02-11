@@ -4,12 +4,15 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Trading.Application.Handlers;
 using Trading.Application.TelegramConstants;
 using Trading.Application.UserContext;
+using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application.TelegramIntegration;
 
 public class MessageHandler(IUserContext userContext,
+                    IUserInputPipelineContext userInputPipelineContext,
                     ITelegramContext telegramContext,
-                    IEnumerable<IHandler> handlers) : IMessageHandler
+                    IEnumerable<IHandler> handlers,
+                    IStateProcessor stateProcessor) : IMessageHandler
 {
     public Tuple<string, InlineKeyboardMarkup> HandleMessage(Message message)
     {
@@ -17,7 +20,7 @@ public class MessageHandler(IUserContext userContext,
         {
             if (userContext.IsMessageExpected)
             {
-                var hasError = userContext.ExecuteUserInputPipeline(message.Text);
+                var hasError = userInputPipelineContext.ExecuteUserInputPipeline(message.Text);
 
                 var keyboardMarkup = new InlineKeyboardMarkup(new[]
                 {
@@ -36,9 +39,9 @@ public class MessageHandler(IUserContext userContext,
             {
                 telegramContext.MessageId = 0;
 
-                if (userContext.State != States.Start)
+                if (stateProcessor.State != States.Start)
                 {
-                    userContext.CatchEvent(Triggers.Start);
+                    stateProcessor.CatchEvent(Triggers.Start);
                 }
 
                 var handler = handlers.FirstOrDefault(h => h.Trigger == Triggers.Start);

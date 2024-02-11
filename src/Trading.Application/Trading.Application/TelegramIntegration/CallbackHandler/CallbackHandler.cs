@@ -6,13 +6,15 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Trading.Application.Handlers;
 using Trading.Application.TelegramConstants;
 using Trading.Application.UserContext;
+using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application.TelegramIntegration;
 
 public class CallbackHandler(ILogger<CallbackHandler> logger,
-                            IUserContext userContext,
+                            IUserInputPipelineContext userInputPipelineContext,
                             IEnumerable<IHandler> handlers,
-                            ICallbackParser callbackParser) : ICallbackHandler
+                            ICallbackParser callbackParser,
+                            IStateProcessor stateProcessor) : ICallbackHandler
 {
     public Tuple<string, InlineKeyboardMarkup> HandleCallback(CallbackQuery callbackQuery)
     {
@@ -22,18 +24,18 @@ public class CallbackHandler(ILogger<CallbackHandler> logger,
             var parsedData = callbackParser.ParseCallbackData(callbackQuery?.Data);
             if (parsedData != null)
             {
-                userContext.CatchEvent(parsedData.Item1);
+                stateProcessor.CatchEvent(parsedData.Item1);
 
-                logger.LogInformation($"Parsed trigger: {parsedData.Item1}, new state: {userContext.State}");
+                logger.LogInformation($"Parsed trigger: {parsedData.Item1}, new state: {stateProcessor.State}");
 
                 var handler = handlers.FirstOrDefault(h => h.Trigger == parsedData.Item1);
                 reply = handler?.Handle(string.IsNullOrEmpty(parsedData.Item2) ? parsedData.Item1.ToString() : parsedData.Item2);
             }
-            else if (userContext.State != States.Start)
+            else if (stateProcessor.State != States.Start)
             {
                 logger.LogInformation($"Can't parse callback data as trigger: {callbackQuery.Data} -  used as select");
 
-                var hasError = userContext.ExecuteUserInputPipeline(callbackQuery.Data);
+                var hasError = userInputPipelineContext.ExecuteUserInputPipeline(callbackQuery.Data);
 
                 reply = new Tuple<string, InlineKeyboardMarkup>(hasError ? "Operation failed" : "Operation have processed successfully",
                     new InlineKeyboardMarkup(new[]

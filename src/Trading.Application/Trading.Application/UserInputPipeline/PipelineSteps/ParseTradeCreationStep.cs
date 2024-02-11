@@ -5,7 +5,7 @@ using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
 
-public class ParseTradeCreationStep(IUserContext userContext, ILogger<ParseTradeCreationStep> logger, bool isOrder) : IPipelineStep
+public class ParseTradeCreationStep(IUserContext userContext, ILogger<UserInputPipelineBuilder> logger, bool isOrder) : IPipelineStep
 {
     public bool Execute(string input)
     {

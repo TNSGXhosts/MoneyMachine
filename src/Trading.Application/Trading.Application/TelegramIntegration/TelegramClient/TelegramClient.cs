@@ -25,6 +25,7 @@ internal class TelegramClient(
     private readonly ILogger<TelegramClient> _logger = logger;
     private readonly TelegramSettings _telegramSettings = options.Value;
     private readonly IMessageHandler _messageHandler = messageHandler;
+    private readonly ICallbackHandler _callbackHandler = callbackHandler;
     private readonly ITelegramContext _telegramContext = telegramContext;
 
     private TelegramBotClient? _botClient;
@@ -60,7 +61,7 @@ internal class TelegramClient(
         {
             if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery != null)
             {
-                var replyToUser = callbackHandler.HandleCallback(update.CallbackQuery);
+                var replyToUser = _callbackHandler.HandleCallback(update.CallbackQuery);
                 await SendReplyAsync(replyToUser.Item1, replyToUser.Item2);
             }
 
@@ -78,23 +79,26 @@ internal class TelegramClient(
 
     private async Task SendReplyAsync(string message, InlineKeyboardMarkup replyMarkup)
     {
-        if (_telegramContext.MessageId == 0)
+        if (_botClient != null)
         {
-            var firstMessage = await _botClient.SendTextMessageAsync(
-                chatId: _telegramSettings.ChatId,
-                text: message,
-                parseMode: ParseMode.Markdown,
-                replyMarkup: replyMarkup);
-            _telegramContext.MessageId = firstMessage.MessageId;
-        }
-        else
-        {
-            await _botClient.EditMessageTextAsync(
-                chatId: _telegramSettings.ChatId,
-                messageId: _telegramContext.MessageId,
-                text: message,
-                parseMode: ParseMode.Markdown,
-                replyMarkup: replyMarkup);
+            if (_telegramContext.MessageId == 0)
+            {
+                var firstMessage = await _botClient.SendTextMessageAsync(
+                    chatId: _telegramSettings.ChatId,
+                    text: message,
+                    parseMode: ParseMode.Markdown,
+                    replyMarkup: replyMarkup);
+                _telegramContext.MessageId = firstMessage.MessageId;
+            }
+            else
+            {
+                await _botClient.EditMessageTextAsync(
+                    chatId: _telegramSettings.ChatId,
+                    messageId: _telegramContext.MessageId,
+                    text: message,
+                    parseMode: ParseMode.Markdown,
+                    replyMarkup: replyMarkup);
+            }
         }
     }
 

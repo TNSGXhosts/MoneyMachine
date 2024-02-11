@@ -4,7 +4,7 @@ using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
 
-public class ParseTradeUpdateStep(IUserContext userContext, ILogger<ParseTradeUpdateStep> logger, bool isOrder) : IPipelineStep
+public class ParseTradeUpdateStep(IUserContext userContext, ILogger<UserInputPipelineBuilder> logger, bool isOrder) : IPipelineStep
 {
     public bool Execute(string input)
     {
