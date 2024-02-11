@@ -22,6 +22,11 @@ public static class PresentationRegistry
 
         services.AddSingleton<IUserContext, UserContext.UserContext>();
 
+        services.AddScoped<IMessageHandler, MessageHandler>();
+        services.AddScoped<ICallbackHandler, CallbackHandler>();
+        services.AddScoped<ICallbackParser, CallbackParser>();
+        services.AddScoped<ITelegramContext, TelegramContext>();
+
         RegisterHandlers(services);
     }
 
