@@ -42,4 +42,7 @@
       <Folder Include="Data\" />
       <Folder Include="DataAccess\" />
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Core\Core.csproj" />
+    </ItemGroup>
 </Project>

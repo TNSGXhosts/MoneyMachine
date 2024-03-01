@@ -1,11 +1,10 @@
-﻿using Trading.Application.DAL.Entities;
+﻿using Core.Models;
 
-namespace Trading.Application.DAL.DataAccess
+namespace Trading.Application.DAL.DataAccess;
+
+public interface IPriceRepository
 {
-    public interface IPriceRepository
-    {
-        Task<IEnumerable<PriceEntity>> GetPricesAsync(string ticker, string timeframe, DateTime from, DateTime to);
+    Task<IEnumerable<PriceEntity>> GetPricesAsync(string ticker, string timeframe, DateTime from, DateTime to);
 
-        Task SavePrices(List<PriceEntity> prices);
-    }
+    Task SavePrices(List<PriceEntity> prices);
 }

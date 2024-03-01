@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using Trading.Application.DAL.Entities;
+using Core.Models;
 
 namespace Trading.Application.DAL.Data
 {
