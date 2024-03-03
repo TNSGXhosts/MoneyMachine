@@ -1,6 +1,5 @@
-using Trading.Application.BLL.CapitalIntegration.Enums;
 
-namespace Trading.Application.BLL.CapitalIntegration.Models;
+namespace Trading.Application.Core.APIRequestsEntities;
 
 public class CreateOrderRequestModel : CreatePositionRequestModel
 {

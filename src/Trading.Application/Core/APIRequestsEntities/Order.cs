@@ -1,27 +1,38 @@
-namespace Trading.Application.BLL.CapitalIntegration.Models;
+namespace Trading.Application.Core.APIRequestsEntities;
 
 // TODO : Refactor file.
 
-public class Position
+public class WorkingOrderResponce
 {
-    public int ContractSize { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime CreatedDateUTC { get; set; }
-    public required string DealId { get; set; }
-    public required string DealReference { get; set; }
-    public required string WorkingOrderId { get; set; }
-    public decimal Size { get; set; }
-    public decimal StopLevel { get;set; }
-    public decimal ProfitLevel { get;set; }
-    public int Leverage { get; set; }
-    public double Upl { get; set; }
-    public required string Direction { get; set; }
-    public double Level { get; set; }
-    public required string Currency { get; set; }
-    public bool GuaranteedStop { get; set; }
+    public required IEnumerable<WorkingOrder> WorkingOrders { get; set; }
 }
 
-public class Market
+public class WorkingOrder
+{
+    public required WorkingOrderData WorkingOrderData { get; set; }
+    public required MarketData MarketData { get; set; }
+}
+
+public class WorkingOrderData
+{
+    public required string DealId { get; set; }
+    public required string Direction { get; set; }
+    public required string Epic { get; set; }
+    public double OrderSize { get; set; }
+    public double OrderLevel { get; set; }
+    public required string TimeInForce { get; set; }
+    public DateTime GoodTillDate { get; set; }
+    public DateTime GoodTillDateUTC { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime CreatedDateUTC { get; set; }
+    public bool GuaranteedStop { get; set; }
+    public required string OrderType { get; set; }
+    public double StopDistance { get; set; }
+    public double ProfitDistance { get; set; }
+    public string CurrencyCode { get; set; }
+}
+
+public class MarketData
 {
     public required string InstrumentName { get; set; }
     public required string Expiry { get; set; }
@@ -40,15 +51,4 @@ public class Market
     public int DelayTime { get; set; }
     public bool StreamingPricesAvailable { get; set; }
     public int ScalingFactor { get; set; }
-}
-
-public class PositionData
-{
-    public required Position Position { get; set; }
-    public required Market Market { get; set; }
-}
-
-public class PositionsResponse
-{
-    public required IEnumerable<PositionData> Positions { get; set; }
 }

@@ -1,4 +1,4 @@
-using Trading.Application.BLL.CapitalIntegration.Enums;
+using Trading.Application.Core.APIRequestsEntities;
 
 namespace Trading.Application.UserContext;
 

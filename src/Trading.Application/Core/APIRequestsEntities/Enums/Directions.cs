@@ -1,4 +1,4 @@
-namespace Trading.Application.BLL.CapitalIntegration.Enums;
+namespace Trading.Application.Core.APIRequestsEntities;
 
 // TODO : Rename it. What is it?
 public enum Directions

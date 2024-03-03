@@ -1,7 +1,4 @@
-using Trading.Application.BLL.CapitalIntegration.Models;
-using Trading.Application.TelegramConstants;
-
-using Trading.Application.UserInputPipeline;
+using Trading.Application.Core.APIRequestsEntities;
 
 namespace Trading.Application.UserContext;
 

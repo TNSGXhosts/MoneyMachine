@@ -32,6 +32,7 @@ public static class BusinessLogicLayerRegistry
 
         services.AddScoped<IOrderClient, OrderClient>();
         services.AddScoped<IPositionClient, PositionClient>();
+        services.AddScoped<IPricesClient, PricesClient>();
     }
 
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)

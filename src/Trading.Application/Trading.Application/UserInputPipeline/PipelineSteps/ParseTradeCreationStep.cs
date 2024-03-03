@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 
-using Trading.Application.BLL.CapitalIntegration.Enums;
+using Trading.Application.Core.APIRequestsEntities;
+
 using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;

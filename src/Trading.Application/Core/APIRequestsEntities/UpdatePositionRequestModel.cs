@@ -1,4 +1,4 @@
-namespace Trading.Application.BLL.CapitalIntegration.Models;
+namespace Trading.Application.Core.APIRequestsEntities;
 
 public class UpdatePositionRequestModel
 {

@@ -19,7 +19,7 @@ public class PriceEntity
 
     public double LastTradedVolume { get; set; }
 
-    public required string Ticker { get; set; }
+    public string Ticker { get; set; }
 
-    public required string TimeFrame { get; set; }
+    public string TimeFrame { get; set; }
 }

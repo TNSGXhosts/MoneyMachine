@@ -4,8 +4,8 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using Trading.Application.BLL.CapitalIntegration.Models;
 using Trading.Application.BLL.Configuration;
+using Trading.Application.Core.APIRequestsEntities;
 
 namespace Trading.Application.BLL.CapitalIntegration;
 

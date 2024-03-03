@@ -1,6 +1,5 @@
 using Trading.Application.BLL.CapitalIntegration;
-using Trading.Application.BLL.CapitalIntegration.Enums;
-using Trading.Application.BLL.CapitalIntegration.Models;
+using Trading.Application.Core.APIRequestsEntities;
 using Trading.Application.UserContext;
 
 namespace Trading.Application.UserInputPipeline;
