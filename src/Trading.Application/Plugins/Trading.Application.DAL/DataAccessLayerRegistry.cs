@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Trading.Application.BLL;
+
 using Trading.Application.DAL.Data;
 using Trading.Application.DAL.DataAccess;
 
@@ -18,7 +20,8 @@ public static class DataAccessLayerRegistry
     {
         //TODO: use string const
         services.AddDbContext<TradingDbContext>(options =>
-            options.UseSqlite(configuration.GetConnectionString("Sqlite")));
+            options.UseSqlite(string.Format(configuration.GetConnectionString("Sqlite"), AppDomain.CurrentDomain.BaseDirectory),
+            sqliteOptionsAction: sqlOptions => sqlOptions.MigrationsAssembly("Trading.Application.DAL")));
 
         services.AddScoped<IPriceRepository, PriceRepository>();
     }

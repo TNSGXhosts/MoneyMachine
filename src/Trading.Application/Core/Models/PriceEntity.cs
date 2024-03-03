@@ -4,10 +4,10 @@ public class PriceEntity
 {
     public int PriceId { get; set; }
 
-    public required string SnapshotTime { get; set; }
+    public required DateTime SnapshotTime { get; set; }
 
     // ReSharper disable once InconsistentNaming
-    public required string SnapshotTimeUTC { get; set; }
+    public required DateTime SnapshotTimeUTC { get; set; }
 
     public TradingVolumesEntity OpenPrice { get; set; }
 

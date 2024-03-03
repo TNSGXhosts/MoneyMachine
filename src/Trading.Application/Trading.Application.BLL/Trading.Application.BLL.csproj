@@ -34,7 +34,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Trading.Application.DAL\Trading.Application.DAL.csproj" />
+      <ProjectReference Include="..\Core\Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="DataStorePluginInterfaces/" />
     </ItemGroup>
 
 </Project>

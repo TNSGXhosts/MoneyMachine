@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Trading.Application;
 using Trading.Application.BLL;
 using Trading.Application.DAL;
+using Trading.Application.DAL.DataAccess;
 using Trading.Application.Presentation;
 using Trading.Application.TelegramIntegration;
 

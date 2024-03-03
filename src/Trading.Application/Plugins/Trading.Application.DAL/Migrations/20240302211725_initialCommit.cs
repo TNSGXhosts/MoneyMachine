@@ -5,7 +5,7 @@
 namespace Trading.Application.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialCommit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,13 +27,15 @@ namespace Trading.Application.DAL.Migrations
                 {
                     PriceId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SnapshotTime = table.Column<string>(type: "TEXT", nullable: false),
-                    SnapshotTimeUTC = table.Column<string>(type: "TEXT", nullable: false),
+                    SnapshotTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    SnapshotTimeUTC = table.Column<DateTime>(type: "TEXT", nullable: false),
                     OpenPriceVolumesId = table.Column<int>(type: "INTEGER", nullable: false),
                     ClosePriceVolumesId = table.Column<int>(type: "INTEGER", nullable: false),
                     HighPriceVolumesId = table.Column<int>(type: "INTEGER", nullable: false),
                     LowPriceVolumesId = table.Column<int>(type: "INTEGER", nullable: false),
-                    LastTradedVolume = table.Column<double>(type: "REAL", nullable: false)
+                    LastTradedVolume = table.Column<double>(type: "REAL", nullable: false),
+                    Ticker = table.Column<string>(type: "TEXT", nullable: false),
+                    TimeFrame = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trading.Application.BLL", "Trading.Application.BLL\Trading.Application.BLL.csproj", "{76657784-EA99-4EDB-BD47-0C6CF2DB0417}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trading.Application.DAL", "Trading.Application.DAL\Trading.Application.DAL.csproj", "{97DBE9B5-9B89-4DD6-97A5-92A3B674C433}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trading.Application.DAL", "Plugins\Trading.Application.DAL\Trading.Application.DAL.csproj", "{97DBE9B5-9B89-4DD6-97A5-92A3B674C433}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{637E1B22-978A-4130-9F81-94C7F2706A4B}"
 EndProject
@@ -44,5 +44,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97DBE9B5-9B89-4DD6-97A5-92A3B674C433} = {AC71779E-0B80-4B65-B28E-94C13A9A3F19}
 	EndGlobalSection
 EndGlobal

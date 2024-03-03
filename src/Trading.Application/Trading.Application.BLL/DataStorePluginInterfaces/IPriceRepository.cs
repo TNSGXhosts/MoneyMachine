@@ -1,6 +1,6 @@
 ﻿using Core.Models;
 
-namespace Trading.Application.DAL.DataAccess;
+namespace Trading.Application.BLL;
 
 public interface IPriceRepository
 {
