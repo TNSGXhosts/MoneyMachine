@@ -12,5 +12,6 @@ public enum Triggers
     EditPosition,
     CloseOrder,
     ClosePosition,
+    TestStrategy,
     Start
 }

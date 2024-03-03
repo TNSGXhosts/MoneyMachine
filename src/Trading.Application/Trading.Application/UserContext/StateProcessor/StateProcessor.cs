@@ -16,6 +16,7 @@ public class StateProcessor : IStateProcessor
         _machine.Configure(States.Start).Permit(Triggers.AddPosition, States.CreationPosition);
         _machine.Configure(States.Start).Permit(Triggers.ChooseOrder, States.ChoosingOrder);
         _machine.Configure(States.Start).Permit(Triggers.ChoosePosition, States.ChoosingPosition);
+        _machine.Configure(States.Start).Permit(Triggers.TestStrategy, States.TestingStrategy);
 
         _machine.Configure(States.CreationOrder).Permit(Triggers.Start, States.Start);
         _machine.Configure(States.CreationPosition).Permit(Triggers.Start, States.Start);
@@ -39,11 +40,11 @@ public class StateProcessor : IStateProcessor
 
         _machine.Configure(States.ClosingPosition).Permit(Triggers.Start, States.Start);
         _machine.Configure(States.ClosingOrder).Permit(Triggers.Start, States.Start);
+
+        _machine.Configure(States.TestingStrategy).Permit(Triggers.Start, States.Start);
     }
 
-    public bool IsMessageExpectedState => (_machine.State == States.UpdatingPosition || _machine.State == States.UpdatingOrder
-            || _machine.State == States.CreationPosition
-            || _machine.State == States.CreationOrder);
+    public bool IsMessageExpectedState => TelegramWorkflowConstants.MessageExpectedStatuses.Contains(State);
 
     public void CatchEvent(Triggers trigger)
     {

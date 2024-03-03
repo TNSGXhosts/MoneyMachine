@@ -24,7 +24,8 @@ internal class StartHandler : IHandler
                     InlineKeyboardButton.WithCallbackData("Add Order:", nameof(Triggers.AddOrder)),
                     InlineKeyboardButton.WithCallbackData("Add Position:", nameof(Triggers.AddPosition)),
                     InlineKeyboardButton.WithCallbackData("Choose Order:", nameof(Triggers.ChooseOrder)),
-                    InlineKeyboardButton.WithCallbackData("Choose Position:", nameof(Triggers.ChoosePosition))
+                    InlineKeyboardButton.WithCallbackData("Choose Position:", nameof(Triggers.ChoosePosition)),
+                    InlineKeyboardButton.WithCallbackData("Test Strategy:", nameof(Triggers.TestStrategy))
                 }
             })
         );

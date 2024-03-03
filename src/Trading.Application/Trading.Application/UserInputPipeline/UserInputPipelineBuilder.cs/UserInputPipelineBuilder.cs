@@ -9,7 +9,8 @@ public class UserInputPipelineBuilder(IUserContext userContext,
                                     IUserInputPipelineContext userInputPipelineContext,
                                     ILogger<UserInputPipelineBuilder> logger,
                                     IOrderClient orderClient,
-                                    IPositionClient positionClient) : IUserInputPipelineBuilder
+                                    IPositionClient positionClient,
+                                    IStateProcessor stateProcessor) : IUserInputPipelineBuilder
 {
     public void BuildAddOrderPipeline()
     {
@@ -40,6 +41,14 @@ public class UserInputPipelineBuilder(IUserContext userContext,
         userInputPipelineContext.UserInputPipeline = new InputPipeline(new List<IPipelineStep>(){
                 new ParseTradeUpdateStep(userContext, logger, false),
                 new UpdatePositionStep(positionClient, userContext),
+            }, userContext);
+    }
+
+    public void BuildTestStrategyPipeline()
+    {
+        userInputPipelineContext.UserInputPipeline = new InputPipeline(new List<IPipelineStep>(){
+                new ParseTestStrategyStep(userContext),
+                new RunStrategyTestStep(userContext, stateProcessor)
             }, userContext);
     }
 }

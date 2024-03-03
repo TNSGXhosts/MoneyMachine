@@ -13,4 +13,5 @@ public enum States
     UpdatingPosition,
     ClosingOrder,
     ClosingPosition,
+    TestingStrategy
 }

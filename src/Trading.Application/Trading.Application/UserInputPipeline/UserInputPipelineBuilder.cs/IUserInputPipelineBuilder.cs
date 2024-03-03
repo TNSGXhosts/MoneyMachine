@@ -6,4 +6,5 @@ public interface IUserInputPipelineBuilder
     void BuildEditPositionPipeline();
     void BuildAddOrderPipeline();
     void BuildEditOrderPipeline();
+    void BuildTestStrategyPipeline();
 }
