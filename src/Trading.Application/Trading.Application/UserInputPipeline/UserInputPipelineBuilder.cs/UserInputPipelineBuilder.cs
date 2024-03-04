@@ -13,6 +13,7 @@ public class UserInputPipelineBuilder(IUserContext userContext,
                                     IOrderClient orderClient,
                                     IPositionClient positionClient,
                                     IStateProcessor stateProcessor,
+                                    IPriceRepository priceRepository,
                                     IDataManager dataManager) : IUserInputPipelineBuilder
 {
     public void BuildAddOrderPipeline()
@@ -51,7 +52,7 @@ public class UserInputPipelineBuilder(IUserContext userContext,
     {
         userInputPipelineContext.UserInputPipeline = new InputPipeline(new List<IPipelineStep>(){
                 new ParseTestStrategyStep(userContext),
-                new RunStrategyTestStep(userContext, stateProcessor, dataManager)
+                new RunStrategyTestStep(userContext, priceRepository, stateProcessor, dataManager)
             }, userContext);
     }
 }

@@ -28,7 +28,11 @@ public class TradingDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<PriceEntity>(entity => entity.HasKey(k => k.PriceId));
+        modelBuilder.Entity<PriceEntity>(entity =>
+        {
+            entity.HasIndex(e => new { e.Ticker, e.TimeFrame, e.SnapshotTime });
+            entity.HasKey(k => k.PriceId);
+        });
         modelBuilder.Entity<TradingVolumesEntity>(entity => entity.HasKey(k => k.VolumesId));
     }
 }

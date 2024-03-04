@@ -22,10 +22,10 @@ internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceReposi
         return await GetPrices(ticker, timeframe, from, to).Select(p => new Quote()
         {
             Date = p.SnapshotTime,
-            Open = p.OpenPrice.Ask,
-            Close = p.ClosePrice.Ask,
-            High = p.HighPrice.Ask,
-            Low = p.LowPrice.Ask,
+            Open = p.OpenPrice.Bid,
+            Close = p.ClosePrice.Bid,
+            High = p.HighPrice.Bid,
+            Low = p.LowPrice.Bid,
             Volume = p.LastTradedVolume
         }).ToListAsync();
     }

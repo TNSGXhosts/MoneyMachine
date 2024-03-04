@@ -1,4 +1,4 @@
-﻿using Core.Models;
+﻿using Core;
 
 using Skender.Stock.Indicators;
 
@@ -18,7 +18,12 @@ public class StrategyProcessor : IStrategyProcessor
 
     public async void Run()
     {
-        _prices = await _priceRepository.GetPricesForStrategyTestAsync(_epic, "HOUR", DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow);
-        _prices.GetMacd();
+        _prices = await _priceRepository.GetPricesForStrategyTestAsync(
+            _epic,
+            nameof(Timeframe.DAY),
+            DateTime.UtcNow.AddMonths(-12),
+            DateTime.UtcNow);
+
+        var sma = _prices.GetSma(50);
     }
 }
