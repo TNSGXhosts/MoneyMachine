@@ -47,7 +47,6 @@
       <Folder Include="DataAccess\" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Core\Core.csproj" />
       <ProjectReference Include="..\..\Core\Core.csproj" />
       <ProjectReference Include="..\..\Trading.Application.BLL\Trading.Application.BLL.csproj" />
     </ItemGroup>

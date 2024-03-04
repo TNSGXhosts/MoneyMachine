@@ -7,7 +7,7 @@ public class TradingVolumesEntity
 {
     public int VolumesId { get; set; }
 
-    public double Bid { get; set; }
+    public decimal Bid { get; set; }
 
-    public double Ask { get; set; }
+    public decimal Ask { get; set; }
 }

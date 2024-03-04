@@ -12,7 +12,7 @@ public class TestStrategyHandler(IUserInputPipelineBuilder userInputPipelineBuil
 
     public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
     {
-        userInputPipelineBuilder.BuildAddOrderPipeline();
+        userInputPipelineBuilder.BuildTestStrategyPipeline();
 
         return new Tuple<string, InlineKeyboardMarkup>(
             @"Enter Test Data:

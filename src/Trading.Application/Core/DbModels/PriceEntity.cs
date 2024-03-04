@@ -17,7 +17,7 @@ public class PriceEntity
 
     public TradingVolumesEntity LowPrice { get; set; }
 
-    public double LastTradedVolume { get; set; }
+    public decimal LastTradedVolume { get; set; }
 
     public string Ticker { get; set; }
 

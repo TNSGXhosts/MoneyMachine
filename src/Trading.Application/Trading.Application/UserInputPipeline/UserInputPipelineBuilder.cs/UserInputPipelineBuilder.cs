@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
 
+using Trading.Application.BLL;
+
 using Trading.Application.BLL.CapitalIntegration;
 using Trading.Application.UserContext;
 
@@ -10,7 +12,8 @@ public class UserInputPipelineBuilder(IUserContext userContext,
                                     ILogger<UserInputPipelineBuilder> logger,
                                     IOrderClient orderClient,
                                     IPositionClient positionClient,
-                                    IStateProcessor stateProcessor) : IUserInputPipelineBuilder
+                                    IStateProcessor stateProcessor,
+                                    IDataManager dataManager) : IUserInputPipelineBuilder
 {
     public void BuildAddOrderPipeline()
     {
@@ -48,7 +51,7 @@ public class UserInputPipelineBuilder(IUserContext userContext,
     {
         userInputPipelineContext.UserInputPipeline = new InputPipeline(new List<IPipelineStep>(){
                 new ParseTestStrategyStep(userContext),
-                new RunStrategyTestStep(userContext, stateProcessor)
+                new RunStrategyTestStep(userContext, stateProcessor, dataManager)
             }, userContext);
     }
 }

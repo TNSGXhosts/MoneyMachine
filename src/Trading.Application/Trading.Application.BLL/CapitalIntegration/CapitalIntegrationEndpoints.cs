@@ -7,3 +7,8 @@ internal static class CapitalIntegrationEndpoints
     public const string Session = "session";
     public const string HistoricalPrices = "prices";
 }
+
+internal static class CapitalIntegrationConstants
+{
+    public const int MaxPricesToDownload = 1000;
+}
