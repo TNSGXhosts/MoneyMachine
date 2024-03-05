@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using Core.Models;
+using Core;
 
 namespace Trading.Application.DAL.Data;
 
@@ -14,6 +15,7 @@ public class TradingDbContext : DbContext
 
     public DbSet<PriceEntity> Prices { get; set; }
     public DbSet<TradingVolumesEntity> TradingVolumes { get; set; }
+    public DbSet<PriceBatch> PriceBatches { get; set; }
 
     public TradingDbContext() { }
 
@@ -28,11 +30,11 @@ public class TradingDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<PriceEntity>(entity =>
-        {
-            entity.HasIndex(e => new { e.Ticker, e.TimeFrame, e.SnapshotTime });
-            entity.HasKey(k => k.PriceId);
-        });
+        modelBuilder.Entity<PriceEntity>(entity => entity.HasKey(k => k.PriceId));
         modelBuilder.Entity<TradingVolumesEntity>(entity => entity.HasKey(k => k.VolumesId));
+        modelBuilder.Entity<PriceBatch>(batch => {
+            batch.HasKey(k => k.PriceBatchId);
+            batch.HasIndex(e => new { e.Ticker, e.TimeFrame, e.Period });
+        });
     }
 }

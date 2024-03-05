@@ -1,34 +1,65 @@
-﻿using Trading.Application.BLL.CapitalIntegration;
+﻿using Core;
+using Core.Models;
+
+using Trading.Application.BLL.CapitalIntegration;
 
 namespace Trading.Application.BLL;
 
 public class DataManager(IPriceRepository priceRepository, IPricesClient pricesClient) : IDataManager
 {
-    public async Task DownloadAndSavePrices(string epic, string timeframe)
+    public async Task DownloadAndSavePrices(string epic, Timeframe timeframe)
     {
-        var fromDate = DateTime.UtcNow.AddMonths(-12);
-        var toDate = DateTime.UtcNow;
+        const Period period = Period.YEAR;
+        var dbPrices = await priceRepository.GetPricesAsync(epic, timeframe, period);
 
-        var dbPrices = await priceRepository.GetPricesAsync(epic, timeframe, fromDate, toDate);
-
-        if (!dbPrices.Any() || dbPrices.LastOrDefault()?.SnapshotTime < toDate.AddDays(-1))
+        if (!dbPrices.Any())
         {
-            var lastDate = dbPrices.LastOrDefault()?.SnapshotTime ?? fromDate;
-
-            await UpdatePrices(epic, timeframe, lastDate, toDate);
+            await UpdatePrices(epic, timeframe, period);
         }
     }
 
-    private async Task UpdatePrices(string epic, string timeframe, DateTime from, DateTime to)
+    private async Task UpdatePrices(string epic, Timeframe timeframe, Period period)
     {
-        var newPrices = await pricesClient.GetHistoricalPrices(epic, timeframe, CapitalIntegrationConstants.MaxPricesToDownload, from, to);
+        var toDate = DateTime.UtcNow.Date.AddDays(-1);
+        var fromDate = toDate.AddMonths(-12);
 
-        foreach (var price in newPrices)
+        var newPrices = new List<PriceEntity>(await pricesClient.GetHistoricalPrices(
+            epic,
+            timeframe,
+            CapitalIntegrationConstants.MaxPricesToDownload,
+            fromDate,
+            toDate
+        ));
+
+        var lastPrice = newPrices.LastOrDefault()?.SnapshotTime;
+        if (!lastPrice.HasValue)
         {
-            price.Ticker = epic;
-            price.TimeFrame = timeframe;
+            throw new Exception("Cannot download prices");
         }
 
-        await priceRepository.SavePricesAsync(newPrices);
+        while (lastPrice < toDate)
+        {
+            newPrices.Concat(await pricesClient.GetHistoricalPrices(
+                epic,
+                timeframe,
+                CapitalIntegrationConstants.MaxPricesToDownload,
+                lastPrice.Value.IncreaseDateByTimeframe(timeframe),
+                toDate
+            ));
+
+            lastPrice = newPrices.LastOrDefault()?.SnapshotTime;
+        }
+
+        var newPriceBatch = new PriceBatch()
+        {
+            Ticker = epic,
+            TimeFrame = timeframe.ToString(),
+            Period = period.ToString(),
+            Prices = new List<PriceEntity>(newPrices),
+            StartDate = fromDate,
+            EndDate = toDate
+        };
+
+        await priceRepository.SavePriceBatchAsync(newPriceBatch);
     }
 }

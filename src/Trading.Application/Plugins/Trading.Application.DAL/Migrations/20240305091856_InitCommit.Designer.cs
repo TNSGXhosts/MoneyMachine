@@ -11,8 +11,8 @@ using Trading.Application.DAL.Data;
 namespace Trading.Application.DAL.Migrations
 {
     [DbContext(typeof(TradingDbContext))]
-    [Migration("20240302211725_initialCommit")]
-    partial class initialCommit
+    [Migration("20240305091856_InitCommit")]
+    partial class InitCommit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,8 +32,8 @@ namespace Trading.Application.DAL.Migrations
                     b.Property<int>("HighPriceVolumesId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("LastTradedVolume")
-                        .HasColumnType("REAL");
+                    b.Property<decimal>("LastTradedVolume")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("LowPriceVolumesId")
                         .HasColumnType("INTEGER");
@@ -41,18 +41,13 @@ namespace Trading.Application.DAL.Migrations
                     b.Property<int>("OpenPriceVolumesId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("PriceBatchId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("SnapshotTime")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("SnapshotTimeUTC")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Ticker")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TimeFrame")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("PriceId");
@@ -65,6 +60,8 @@ namespace Trading.Application.DAL.Migrations
 
                     b.HasIndex("OpenPriceVolumesId");
 
+                    b.HasIndex("PriceBatchId");
+
                     b.ToTable("Prices");
                 });
 
@@ -74,15 +71,46 @@ namespace Trading.Application.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("Ask")
-                        .HasColumnType("REAL");
+                    b.Property<decimal>("Ask")
+                        .HasColumnType("TEXT");
 
-                    b.Property<double>("Bid")
-                        .HasColumnType("REAL");
+                    b.Property<decimal>("Bid")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("VolumesId");
 
                     b.ToTable("TradingVolumes");
+                });
+
+            modelBuilder.Entity("Core.PriceBatch", b =>
+                {
+                    b.Property<int>("PriceBatchId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TimeFrame")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PriceBatchId");
+
+                    b.HasIndex("Ticker", "TimeFrame", "Period");
+
+                    b.ToTable("PriceBatches");
                 });
 
             modelBuilder.Entity("Core.Models.PriceEntity", b =>
@@ -111,6 +139,12 @@ namespace Trading.Application.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Core.PriceBatch", "PriceBatch")
+                        .WithMany("Prices")
+                        .HasForeignKey("PriceBatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("ClosePrice");
 
                     b.Navigation("HighPrice");
@@ -118,6 +152,13 @@ namespace Trading.Application.DAL.Migrations
                     b.Navigation("LowPrice");
 
                     b.Navigation("OpenPrice");
+
+                    b.Navigation("PriceBatch");
+                });
+
+            modelBuilder.Entity("Core.PriceBatch", b =>
+                {
+                    b.Navigation("Prices");
                 });
 #pragma warning restore 612, 618
         }

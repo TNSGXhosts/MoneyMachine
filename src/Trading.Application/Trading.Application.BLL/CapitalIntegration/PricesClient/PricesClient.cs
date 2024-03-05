@@ -19,7 +19,7 @@ public class PricesClient(
 
     async Task<IEnumerable<PriceEntity>> IPricesClient.GetHistoricalPrices(
         string epic,
-        string resolution = null,
+        Timeframe resolution,
         int? max = null,
         DateTime? from = null,
         DateTime? to = null)
@@ -29,7 +29,17 @@ public class PricesClient(
             var uriBuilder = new UriBuilder(_capitalSettings.BaseUrl);
             uriBuilder.Path += CapitalIntegrationEndpoints.HistoricalPrices;
             uriBuilder.Path += $"/{epic}";
-            uriBuilder.Query = $"{nameof(resolution)}={resolution}&{nameof(max)}={max}"; //&{nameof(from)}={from}&{nameof(to)}={to}";
+            uriBuilder.Query = $"{nameof(resolution)}={resolution}&{nameof(max)}={max}";
+
+            if (from.HasValue)
+            {
+                uriBuilder.Query += $"&{nameof(from)}={from.Value:yyyy-MM-ddTHH:mm:ss}";
+            }
+
+            if (to.HasValue)
+            {
+                uriBuilder.Query += $"&{nameof(to)}={to.Value:yyyy-MM-ddTHH:mm:ss}";
+            }
 
             var httpClient = httpClientFactory.CreateClient("capitalIntegration");
             var request = new HttpRequestMessage(HttpMethod.Get, uriBuilder.Uri);

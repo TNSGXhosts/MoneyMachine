@@ -9,17 +9,14 @@ namespace Trading.Application;
 public class RunStrategyTestStep(
     IUserContext userContext,
     IPriceRepository priceRepository,
-    IStateProcessor stateProcessor,
     IDataManager dataManager) : IPipelineStep
 {
     public bool Execute(string input)
     {
-        dataManager.DownloadAndSavePrices(userContext.OrderData.Epic, nameof(Timeframe.DAY));
+        dataManager.DownloadAndSavePrices(userContext.OrderData.Epic, Timeframe.DAY);
 
         var strategy = new StrategyProcessor(input, priceRepository);
         strategy.Run();
-
-        stateProcessor.CatchEvent(TelegramConstants.Triggers.Start);
 
         return true;
     }

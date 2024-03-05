@@ -18,11 +18,11 @@ public class StrategyProcessor : IStrategyProcessor
 
     public async void Run()
     {
+        var toDate = DateTime.UtcNow.Date;
         _prices = await _priceRepository.GetPricesForStrategyTestAsync(
             _epic,
-            nameof(Timeframe.DAY),
-            DateTime.UtcNow.AddMonths(-12),
-            DateTime.UtcNow);
+            Timeframe.DAY,
+            Period.YEAR);
 
         var sma = _prices.GetSma(50);
     }

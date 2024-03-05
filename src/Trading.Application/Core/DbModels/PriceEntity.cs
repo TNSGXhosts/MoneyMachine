@@ -18,8 +18,6 @@ public class PriceEntity
     public TradingVolumesEntity LowPrice { get; set; }
 
     public decimal LastTradedVolume { get; set; }
-
-    public string Ticker { get; set; }
-
-    public string TimeFrame { get; set; }
+    public int PriceBatchId { get;set; }
+    public PriceBatch PriceBatch { get; set; }
 }

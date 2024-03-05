@@ -1,4 +1,5 @@
-﻿using Core.Models;
+﻿using Core;
+using Core.Models;
 
 using Skender.Stock.Indicators;
 
@@ -6,8 +7,7 @@ namespace Trading.Application.BLL;
 
 public interface IPriceRepository
 {
-    Task<IEnumerable<PriceEntity>> GetPricesAsync(string ticker, string timeframe, DateTime from, DateTime to);
-    Task<IEnumerable<Quote>> GetPricesForStrategyTestAsync(string ticker, string timeframe, DateTime from, DateTime to);
-
-    Task SavePricesAsync(IEnumerable<PriceEntity> prices);
+    Task<IEnumerable<PriceEntity>> GetPricesAsync(string ticker, Timeframe timeframe, Period period);
+    Task<IEnumerable<Quote>> GetPricesForStrategyTestAsync(string ticker, Timeframe timeframe, Period period);
+    Task SavePriceBatchAsync(PriceBatch batch);
 }

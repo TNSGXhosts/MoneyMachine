@@ -1,4 +1,5 @@
-﻿using Core.Models;
+﻿using Core;
+using Core.Models;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -12,14 +13,16 @@ namespace Trading.Application.DAL.DataAccess;
 
 internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceRepository
 {
-    public async Task<IEnumerable<PriceEntity>> GetPricesAsync(string ticker, string timeframe, DateTime from, DateTime to)
+    public async Task<IEnumerable<PriceEntity>> GetPricesAsync(string ticker, Timeframe timeframe, Period period)
     {
-        return await GetPrices(ticker, timeframe, from, to).ToListAsync();
+        var prices = await GetPriceBatch(ticker, timeframe, period);
+        return prices;
     }
 
-    public async Task<IEnumerable<Quote>> GetPricesForStrategyTestAsync(string ticker, string timeframe, DateTime from, DateTime to)
+    public async Task<IEnumerable<Quote>> GetPricesForStrategyTestAsync(string ticker, Timeframe timeframe, Period period)
     {
-        return await GetPrices(ticker, timeframe, from, to).Select(p => new Quote()
+        var prices = await GetPriceBatch(ticker, timeframe, period);
+        return prices.Select(p => new Quote()
         {
             Date = p.SnapshotTime,
             Open = p.OpenPrice.Bid,
@@ -27,21 +30,22 @@ internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceReposi
             High = p.HighPrice.Bid,
             Low = p.LowPrice.Bid,
             Volume = p.LastTradedVolume
-        }).ToListAsync();
+        });
     }
 
-    private IQueryable<PriceEntity> GetPrices(string ticker, string timeframe, DateTime from, DateTime to)
+    private async Task<IEnumerable<PriceEntity>> GetPriceBatch(string ticker, Timeframe timeframe, Period period)
     {
-        return tradingDbContext.Prices
-            .Where(p
+        var priceBatch = await tradingDbContext.PriceBatches
+            .FirstOrDefaultAsync(p
                 => p.Ticker == ticker
-                    && p.TimeFrame == timeframe
-                    && p.SnapshotTime >= from && p.SnapshotTime <= to);
+                    && p.TimeFrame == timeframe.ToString() && p.Period == period.ToString());
+
+        return priceBatch?.Prices ?? Enumerable.Empty<PriceEntity>();
     }
 
-    public async Task SavePricesAsync(IEnumerable<PriceEntity> prices)
+    public async Task SavePriceBatchAsync(PriceBatch batch)
     {
-        tradingDbContext.AddRange(prices);
+        tradingDbContext.PriceBatches.Add(batch);
         await tradingDbContext.SaveChangesAsync();
     }
 }

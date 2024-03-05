@@ -12,7 +12,6 @@ public class UserInputPipelineBuilder(IUserContext userContext,
                                     ILogger<UserInputPipelineBuilder> logger,
                                     IOrderClient orderClient,
                                     IPositionClient positionClient,
-                                    IStateProcessor stateProcessor,
                                     IPriceRepository priceRepository,
                                     IDataManager dataManager) : IUserInputPipelineBuilder
 {
@@ -52,7 +51,7 @@ public class UserInputPipelineBuilder(IUserContext userContext,
     {
         userInputPipelineContext.UserInputPipeline = new InputPipeline(new List<IPipelineStep>(){
                 new ParseTestStrategyStep(userContext),
-                new RunStrategyTestStep(userContext, priceRepository, stateProcessor, dataManager)
+                new RunStrategyTestStep(userContext, priceRepository, dataManager)
             }, userContext);
     }
 }
