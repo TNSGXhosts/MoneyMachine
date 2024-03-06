@@ -19,10 +19,13 @@ internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceReposi
         return prices;
     }
 
-    public async Task<IEnumerable<Quote>> GetPricesForStrategyTestAsync(string ticker, Timeframe timeframe, Period period)
+    public async Task<(IEnumerable<Quote>, IEnumerable<Quote>)> GetPricesForStrategyTestAsync(
+        string ticker,
+        Timeframe timeframe,
+        Period period)
     {
         var prices = await GetPriceBatch(ticker, timeframe, period);
-        return prices.Select(p => new Quote()
+        var bidPrices = prices.Select(p => new Quote()
         {
             Date = p.SnapshotTime,
             Open = p.OpenPrice.Bid,
@@ -31,11 +34,26 @@ internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceReposi
             Low = p.LowPrice.Bid,
             Volume = p.LastTradedVolume
         });
+        var askPrices = prices.Select(p => new Quote()
+        {
+            Date = p.SnapshotTime,
+            Open = p.OpenPrice.Ask,
+            Close = p.ClosePrice.Ask,
+            High = p.HighPrice.Bid,
+            Low = p.LowPrice.Bid,
+            Volume = p.LastTradedVolume
+        });
+
+        return (bidPrices, askPrices);
     }
 
     private async Task<IEnumerable<PriceEntity>> GetPriceBatch(string ticker, Timeframe timeframe, Period period)
     {
         var priceBatch = await tradingDbContext.PriceBatches
+            .Include(b => b.Prices).ThenInclude(p => p.HighPrice)
+            .Include(b => b.Prices).ThenInclude(p => p.LowPrice)
+            .Include(b => b.Prices).ThenInclude(p => p.ClosePrice)
+            .Include(b => b.Prices).ThenInclude(p => p.OpenPrice)
             .FirstOrDefaultAsync(p
                 => p.Ticker == ticker
                     && p.TimeFrame == timeframe.ToString() && p.Period == period.ToString());
