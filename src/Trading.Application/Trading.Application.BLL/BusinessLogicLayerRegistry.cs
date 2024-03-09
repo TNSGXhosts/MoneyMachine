@@ -37,6 +37,7 @@ public static class BusinessLogicLayerRegistry
         services.AddScoped<IDataManager, DataManager>();
         services.AddScoped<ITestProcessor, TestProcessor>();
         services.AddScoped<IStrategy, SimpleStrategy>();
+        services.AddScoped<IStrategyContext, StrategyContext>();
     }
 
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)

@@ -8,6 +8,6 @@ public static class TelegramWorkflowConstants
         States.UpdatingPosition,
         States.UpdatingOrder,
         States.CreationPosition,
-        States.CreationOrder,
-        States.TestingStrategy ];
+        States.CreationOrder
+    ];
 }

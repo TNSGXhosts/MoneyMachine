@@ -18,10 +18,10 @@ public class TestStrategyHandler(
     {
         await dataManager.DownloadAndSavePricesAsync(Timeframe.DAY);
 
-        await testProcessor.Run();
+        var result = await testProcessor.Run();
 
         return new Tuple<string, InlineKeyboardMarkup>(
-            "Test has been ended",
+            result,
              new InlineKeyboardMarkup(new[]
                 {
                     new []

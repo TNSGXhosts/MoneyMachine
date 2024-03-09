@@ -1,4 +1,6 @@
-﻿namespace Trading.Application.BLL;
+﻿using Core;
+
+namespace Trading.Application.BLL;
 
 public static class StrategyConstants
 {
@@ -9,4 +11,8 @@ public static class StrategyConstants
     };
 
     public const string BTCUSD = "BTCUSD";
+
+    public static readonly Timeframe Timeframe = Timeframe.DAY;
+
+    public const decimal StartBalance = 10000m;
 }

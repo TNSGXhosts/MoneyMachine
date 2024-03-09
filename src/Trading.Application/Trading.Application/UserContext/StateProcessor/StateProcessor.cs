@@ -12,7 +12,7 @@ public class StateProcessor : IStateProcessor
 
     public StateProcessor()
     {
-                _machine.Configure(States.Start).Permit(Triggers.AddOrder, States.CreationOrder);
+        _machine.Configure(States.Start).Permit(Triggers.AddOrder, States.CreationOrder);
         _machine.Configure(States.Start).Permit(Triggers.AddPosition, States.CreationPosition);
         _machine.Configure(States.Start).Permit(Triggers.ChooseOrder, States.ChoosingOrder);
         _machine.Configure(States.Start).Permit(Triggers.ChoosePosition, States.ChoosingPosition);
