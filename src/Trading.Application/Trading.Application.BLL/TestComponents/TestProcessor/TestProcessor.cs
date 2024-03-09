@@ -7,7 +7,11 @@ namespace Trading.Application.BLL;
 public class TestProcessor(IPriceRepository priceRepository, IStrategy strategy) : ITestProcessor
 {
     private decimal _balance = 10000m;
-    private readonly IDictionary<string, EpicTestData> _testData = new Dictionary<string, EpicTestData>();
+    private readonly Timeframe _timeframe = Timeframe.DAY;
+
+    private readonly IDictionary<string, Dictionary<DateTime, EpicTestData>> _testData
+        = new Dictionary<string, Dictionary<DateTime, EpicTestData>>();
+
     private readonly decimal _percentOfBalanceForTrade = 0.1m;
     private IList<OpenTestPosition> _openPositionPrices = new List<OpenTestPosition>();
 
@@ -28,19 +32,28 @@ public class TestProcessor(IPriceRepository priceRepository, IStrategy strategy)
             {
                 var prices = await priceRepository.GetPricesForStrategyTestAsync(
                 epic,
-                Timeframe.DAY,
-                Period.YEAR);
+                _timeframe,
+                Period.YEAR_5);
 
                 var askPrices = prices.Item1.ToList();
                 var bidPrices = prices.Item2.ToList();
 
-                _testData.Add(epic, new EpicTestData
+                var sma20 = askPrices.GetSma(20).ToList();
+                var sma50 = askPrices.GetSma(50).ToList();
+
+                var data = new Dictionary<DateTime, EpicTestData>();
+                for (var i = 0; i < askPrices.Count; i++)
                 {
-                    BidPrices = askPrices,
-                    AskPrices = bidPrices,
-                    Sma20 = askPrices.GetSma(20).ToList(),
-                    Sma50 = askPrices.GetSma(50).ToList()
-                });
+                    data.Add(askPrices[i].Date, new EpicTestData
+                    {
+                        AskPrice = askPrices[i],
+                        BidPrice = bidPrices[i],
+                        Sma20 = sma20[i],
+                        Sma50 = sma50[i],
+                    });
+                }
+
+                _testData.Add(epic, data);
             }
         }
     }
@@ -49,54 +62,55 @@ public class TestProcessor(IPriceRepository priceRepository, IStrategy strategy)
     {
         if (_testData.Count > 0)
         {
-            for (var i = 0; i < _testData.First().Value.AskPrices.Count; i++)
+            foreach(var prices in _testData[StrategyConstants.BTCUSD])
             {
-                ClosePositionsIfNecessary(i);
-                OpenPositionIfSignal(i);
+                ClosePositionsIfNecessary(prices.Key);
+                OpenPositionIfSignal(prices.Key);
             }
         }
     }
 
-    public IEnumerable<string> ChooseCoinsToTrade(int i)
+    public IEnumerable<string> ChooseCoinsToTrade(DateTime dateTime)
     {
-        if (i > 0)
+        var priceChanges = new Dictionary<string, decimal>();
+
+        foreach(var epicData in _testData)
         {
-            var priceChanges = new Dictionary<string, decimal>();
-
-            foreach(var epicData in _testData)
-            {
-                priceChanges.Add(
-                    epicData.Key,
-                    CalculatePercentageChange(epicData.Value.AskPrices[i - 1].Close, epicData.Value.AskPrices[i].Close));
-            }
-
-            var sortedPriceChanges = priceChanges.OrderByDescending(d => d.Value);
-            return sortedPriceChanges.Take(5).Select(d => d.Key);
+            priceChanges.Add(
+                epicData.Key,
+                CalculatePercentageChange(
+                    epicData.Value.GetAskPrice(dateTime.GetPreviousDate(_timeframe)).Close,
+                    epicData.Value.GetAskPrice(dateTime).Close));
         }
+
+        var sortedPriceChanges = priceChanges.OrderByDescending(d => d.Value);
+        return sortedPriceChanges.Take(5).Select(d => d.Key);
 
         return Enumerable.Empty<string>();
     }
 
     private decimal CalculatePercentageChange(decimal oldPrice, decimal newPrice)
     {
+        if (oldPrice == 0)
+        {
+            return 0;
+        }
+
         return ((newPrice - oldPrice) / oldPrice) * 100;
     }
 
-    public void ClosePositionsIfNecessary(int i)
+    public void ClosePositionsIfNecessary(DateTime dateTime)
     {
         var newPositionList = new List<OpenTestPosition>();
         foreach(var price in _openPositionPrices)
         {
-            var currentTestData = GetSma20AskCloseByIndex(price.Epic, i);
-            var previousTestData = GetSma20AskCloseByIndex(price.Epic, i - 1);
-
             if (strategy.IsClosePositionSignal(
-                currentTestData.Item1,
-                previousTestData.Item1,
-                currentTestData.Item2,
-                previousTestData.Item2))
+                _testData.GetSma20(price.Epic, dateTime),
+                _testData.GetSma20(price.Epic, dateTime.GetPreviousDate(_timeframe)),
+                _testData.GetAskPrice(price.Epic, dateTime).Close,
+                _testData.GetAskPrice(price.Epic, dateTime.GetPreviousDate(_timeframe)).Close))
             {
-                ClosePosition(i, price.Epic, price.OpenPrice, price.OpenVolume);
+                ClosePosition(dateTime, price.Epic, price.OpenPrice, price.OpenVolume);
             } else {
                 newPositionList.Add(price);
             }
@@ -105,32 +119,30 @@ public class TestProcessor(IPriceRepository priceRepository, IStrategy strategy)
         _openPositionPrices = newPositionList;
     }
 
-    private void ClosePosition(int i, string epic, decimal openPrice, decimal openVolume)
+    private void ClosePosition(DateTime dateTime, string epic, decimal openPrice, decimal openVolume)
     {
-        var priceChangePercentage = ((_testData.GetBidPrice(epic, i).Close - openPrice) / openPrice) * 100;
+        var priceChangePercentage = ((_testData.GetBidPrice(epic, dateTime).Close - openPrice) / openPrice) * 100;
 
         _balance += (openVolume * (100 + priceChangePercentage) / 100) - openVolume;
     }
 
-    public void OpenPositionIfSignal(int i)
+    public void OpenPositionIfSignal(DateTime dateTime)
     {
-        var epics = ChooseCoinsToTrade(i);
+        var epics = ChooseCoinsToTrade(dateTime);
 
         var epicsWithSignals = new Dictionary<string, Quote>();
         foreach(var epic in epics)
         {
-            var currentTestData = GetSma20AskCloseByIndex(epic, i);
-            var previousTestData = GetSma20AskCloseByIndex(epic, i - 1);
-
             if (strategy.IsOpenPositionSignal(
-                currentTestData.Item1,
-                previousTestData.Item1,
-                currentTestData.Item2,
-                previousTestData.Item2,
-                (decimal)_testData.GetSma50(epic, i)
+                _testData.GetSma20(epic, dateTime),
+                _testData.GetSma20(epic, dateTime.GetPreviousDate(_timeframe)),
+                _testData.GetAskPrice(epic, dateTime).Close,
+                _testData.GetAskPrice(epic, dateTime.GetPreviousDate(_timeframe)).Close,
+                _testData.GetSma50(StrategyConstants.BTCUSD, dateTime),
+                _testData.GetAskPrice(StrategyConstants.BTCUSD, dateTime).Close
                 ) && _openPositionPrices.Count < 10)
             {
-                epicsWithSignals.Add(epic, _testData.GetAskPrice(epic, i));
+                epicsWithSignals.Add(epic, _testData[epic][dateTime].AskPrice);
             }
         }
 
@@ -144,10 +156,5 @@ public class TestProcessor(IPriceRepository priceRepository, IStrategy strategy)
                 OpenVolume = _balance * _percentOfBalanceForTrade
             });
         }
-    }
-
-    private (decimal, decimal) GetSma20AskCloseByIndex(string epic, int i)
-    {
-        return (_testData.GetSma20(epic, i), _testData.GetAskPrice(epic, i).Close);
     }
 }

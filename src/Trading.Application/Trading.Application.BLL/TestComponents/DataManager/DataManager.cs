@@ -9,7 +9,7 @@ public class DataManager(IPriceRepository priceRepository, IPricesClient pricesC
 {
     public async Task DownloadAndSavePricesAsync(Timeframe timeframe)
     {
-        const Period period = Period.YEAR;
+        const Period period = Period.YEAR_5;
 
         foreach (var epic in StrategyConstants.Coins)
         {

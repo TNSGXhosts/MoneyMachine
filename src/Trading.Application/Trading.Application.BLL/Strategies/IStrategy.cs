@@ -7,7 +7,8 @@ public interface IStrategy
         decimal previousSma20,
         decimal askClosePrice,
         decimal previousAskClosePrice,
-        decimal sma50
+        decimal sma50,
+        decimal btcAskClosePrice
     );
 
     bool IsClosePositionSignal(

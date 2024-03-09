@@ -7,10 +7,11 @@ public class SimpleStrategy : IStrategy
         decimal previousSma20,
         decimal askClosePrice,
         decimal previousAskClosePrice,
-        decimal sma50
+        decimal sma50,
+        decimal btcAskClosePrice
     )
     {
-        return IsSma50AbovePrice(sma50, askClosePrice)
+        return IsSma50AbovePrice(sma50, btcAskClosePrice)
             && IsPriceCrossUpSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice);
     }
 

@@ -6,45 +6,68 @@ namespace Trading.Application.BLL;
 
 public static class TestProcessExtensions
 {
-    public static Quote GetAskPrice(this IDictionary<string, EpicTestData> epics, string epic, int index)
+    public static Quote GetAskPrice(this IDictionary<string, Dictionary<DateTime, EpicTestData>> epics, string epic, DateTime date)
     {
-        if (epics?.TryGetValue(epic, out var epicTestData) == true && index >= 0 && index < epicTestData.AskPrices.Count)
+        if (epics?.TryGetValue(epic, out var epicTestData) == true && epicTestData?.TryGetValue(date, out var price) == true)
         {
-            return epicTestData.BidPrices[index];
+            return price.AskPrice;
         }
 
         return new Quote();
     }
 
-    public static Quote GetBidPrice(this IDictionary<string, EpicTestData> epics, string epic, int index)
+    public static Quote GetBidPrice(this IDictionary<string, Dictionary<DateTime, EpicTestData>> epics, string epic, DateTime date)
     {
-        if (epics?.TryGetValue(epic, out var epicTestData) == true && index >= 0 && index < epicTestData.BidPrices.Count)
+        if (epics?.TryGetValue(epic, out var epicTestData) == true && epicTestData?.TryGetValue(date, out var price) == true)
         {
-            return epicTestData.BidPrices[index];
+            return price.BidPrice;
         }
 
         return new Quote();
     }
 
-    public static decimal GetSma20(this IDictionary<string, EpicTestData>? epics, string epic, int index)
+    public static decimal GetSma20(this IDictionary<string, Dictionary<DateTime, EpicTestData>> epics, string epic, DateTime date)
     {
-        if (epics?.TryGetValue(epic, out var epicTestData) == true && index >= 0 && index < epicTestData.Sma20.Count)
+        if (epics?.TryGetValue(epic, out var epicTestData) == true && epicTestData?.TryGetValue(date, out var price) == true)
         {
-            var sma = epicTestData?.Sma20?[index]?.Sma;
+            var sma = price?.Sma20.Sma;
             return sma != null ? new decimal(sma.Value) : 0m;
         }
 
         return 0m;
     }
 
-    public static decimal GetSma50(this IDictionary<string, EpicTestData> epics, string epic, int index)
+    public static decimal GetSma50(this IDictionary<string, Dictionary<DateTime, EpicTestData>> epics, string epic, DateTime date)
     {
-        if (epics?.TryGetValue(epic, out var epicTestData) == true && index >= 0 && index < epicTestData.Sma50.Count)
+        if (epics?.TryGetValue(epic, out var epicTestData) == true && epicTestData?.TryGetValue(date, out var price) == true)
         {
-            var sma = epicTestData?.Sma50?[index]?.Sma;
+            var sma = price?.Sma50.Sma;
             return sma != null ? new decimal(sma.Value) : 0m;
         }
 
         return 0m;
+    }
+
+    public static DateTime GetPreviousDate(this DateTime dateTime, Timeframe timeframe)
+    {
+        switch (timeframe)
+        {
+            case Timeframe.HOUR:
+                return dateTime.AddHours(-1);
+            case Timeframe.DAY:
+                return dateTime.AddDays(-1);
+            default:
+                throw new ArgumentException("Invalid timeframe value", nameof(timeframe));
+        }
+    }
+
+    public static Quote GetAskPrice(this Dictionary<DateTime, EpicTestData> epicData, DateTime date)
+    {
+        if (epicData?.TryGetValue(date, out var price) == true)
+        {
+            return price.AskPrice;
+        }
+
+        return new Quote();
     }
 }
