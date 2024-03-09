@@ -11,13 +11,13 @@ internal class SelectPositionHandler(IUserContext userContext, IPositionClient p
 {
     public Triggers Trigger => Triggers.SelectPosition;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         userContext.InputCallback = userInput;
 
         userContext.PositionData = positionClient.GetPositionsAsync().Result.First(p => p.Position.DealId == userInput);
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             "Choose an action:",
             new InlineKeyboardMarkup(new []
             {
@@ -27,6 +27,6 @@ internal class SelectPositionHandler(IUserContext userContext, IPositionClient p
                     InlineKeyboardButton.WithCallbackData("Close Position", nameof(Triggers.ClosePosition)),
                     InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                 }
-            }));
+            })));
     }
 }

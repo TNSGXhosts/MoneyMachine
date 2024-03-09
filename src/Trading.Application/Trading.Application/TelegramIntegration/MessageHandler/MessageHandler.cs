@@ -14,7 +14,7 @@ public class MessageHandler(IUserContext userContext,
                     IEnumerable<IHandler> handlers,
                     IStateProcessor stateProcessor) : IMessageHandler
 {
-    public Tuple<string, InlineKeyboardMarkup> HandleMessage(Message message)
+    public async Task<Tuple<string, InlineKeyboardMarkup>> HandleMessage(Message message)
     {
         if (message.Text != null)
         {
@@ -45,11 +45,14 @@ public class MessageHandler(IUserContext userContext,
                 }
 
                 var handler = handlers.FirstOrDefault(h => h.Trigger == Triggers.Start);
-                var reply = handler?.Handle(message.Text);
-
-                if (!string.IsNullOrEmpty(reply?.Item1))
+                if (handler != null)
                 {
-                    return new Tuple<string, InlineKeyboardMarkup>(reply.Item1, reply.Item2);
+                    var reply = await handler?.HandleAsync(message.Text);
+
+                    if (!string.IsNullOrEmpty(reply?.Item1))
+                    {
+                        return new Tuple<string, InlineKeyboardMarkup>(reply.Item1, reply.Item2);
+                    }
                 }
             }
         }

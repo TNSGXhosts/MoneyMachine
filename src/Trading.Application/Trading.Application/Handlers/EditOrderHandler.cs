@@ -13,11 +13,11 @@ internal class EditOrderHandler(
 {
     public Triggers Trigger => Triggers.EditOrder;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         userInputPipelineBuilder.BuildEditOrderPipeline();
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             GetMessage(),
             new InlineKeyboardMarkup(new []
             {
@@ -25,7 +25,7 @@ internal class EditOrderHandler(
                 {
                     InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                 }
-            }));
+            })));
     }
 
     private string GetMessage()

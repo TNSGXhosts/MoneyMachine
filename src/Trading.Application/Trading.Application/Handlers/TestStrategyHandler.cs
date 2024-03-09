@@ -1,22 +1,27 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using Core;
 
+using Telegram.Bot.Types.ReplyMarkups;
+
+using Trading.Application.BLL;
 using Trading.Application.Handlers;
 using Trading.Application.TelegramConstants;
-using Trading.Application.UserInputPipeline;
 
 namespace Trading.Application;
 
-public class TestStrategyHandler(IUserInputPipelineBuilder userInputPipelineBuilder) : IHandler
+public class TestStrategyHandler(
+    IDataManager dataManager,
+    ITestProcessor testProcessor) : IHandler
 {
     public Triggers Trigger => Triggers.TestStrategy;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public async Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
-        userInputPipelineBuilder.BuildTestStrategyPipeline();
+        await dataManager.DownloadAndSavePricesAsync(Timeframe.DAY);
+
+        await testProcessor.Run();
 
         return new Tuple<string, InlineKeyboardMarkup>(
-            @"Enter Test Data:
-            Ticker - 'SILVER'",
+            "Test has been ended",
              new InlineKeyboardMarkup(new[]
                 {
                     new []

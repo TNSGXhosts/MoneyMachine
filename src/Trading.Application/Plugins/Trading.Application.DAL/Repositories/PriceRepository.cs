@@ -15,7 +15,7 @@ internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceReposi
 {
     public async Task<IEnumerable<PriceEntity>> GetPricesAsync(string ticker, Timeframe timeframe, Period period)
     {
-        var prices = await GetPriceBatch(ticker, timeframe, period);
+        var prices = await GetPriceBatchAsync(ticker, timeframe, period);
         return prices;
     }
 
@@ -24,7 +24,7 @@ internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceReposi
         Timeframe timeframe,
         Period period)
     {
-        var prices = await GetPriceBatch(ticker, timeframe, period);
+        var prices = await GetPriceBatchAsync(ticker, timeframe, period);
         var bidPrices = prices.Select(p => new Quote()
         {
             Date = p.SnapshotTime,
@@ -47,7 +47,7 @@ internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceReposi
         return (bidPrices, askPrices);
     }
 
-    private async Task<IEnumerable<PriceEntity>> GetPriceBatch(string ticker, Timeframe timeframe, Period period)
+    private async Task<IEnumerable<PriceEntity>> GetPriceBatchAsync(string ticker, Timeframe timeframe, Period period)
     {
         var priceBatch = await tradingDbContext.PriceBatches
             .Include(b => b.Prices).ThenInclude(p => p.HighPrice)
@@ -65,5 +65,15 @@ internal class PriceRepository(TradingDbContext tradingDbContext) : IPriceReposi
     {
         tradingDbContext.PriceBatches.Add(batch);
         await tradingDbContext.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsBatchExistsAsync(string ticker, Timeframe timeframe, Period period)
+    {
+        var exists = await tradingDbContext.PriceBatches
+            .AnyAsync(p
+                => p.Ticker == ticker
+                    && p.TimeFrame == timeframe.ToString() && p.Period == period.ToString());
+
+        return exists;
     }
 }

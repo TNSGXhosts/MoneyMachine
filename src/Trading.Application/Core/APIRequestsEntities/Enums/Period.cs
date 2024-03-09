@@ -2,6 +2,7 @@
 
 public enum Period
 {
+    MONTH,
     YEAR,
-    MONTH
+    YEAR_5
 }

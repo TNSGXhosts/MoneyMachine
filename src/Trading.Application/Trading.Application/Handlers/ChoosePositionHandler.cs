@@ -10,7 +10,7 @@ internal class ChoosePositionHandler(IPositionClient positionClient) : IHandler
 {
     public Triggers Trigger => Triggers.ChoosePosition;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         var positions = positionClient.GetPositionsAsync();
         var keyboardButtons = positions.Result
@@ -29,8 +29,8 @@ internal class ChoosePositionHandler(IPositionClient positionClient) : IHandler
         buttonLines.Add(new List<InlineKeyboardButton>() { InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)) });
         var keyboardMarkup = new InlineKeyboardMarkup(buttonLines);
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             "Choose a position:",
-            keyboardMarkup);
+            keyboardMarkup));
     }
 }

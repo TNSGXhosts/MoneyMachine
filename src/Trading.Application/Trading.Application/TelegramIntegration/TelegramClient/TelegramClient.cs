@@ -61,13 +61,13 @@ internal class TelegramClient(
         {
             if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery != null)
             {
-                var replyToUser = _callbackHandler.HandleCallback(update.CallbackQuery);
+                var replyToUser = await _callbackHandler.HandleCallback(update.CallbackQuery);
                 await SendReplyAsync(replyToUser.Item1, replyToUser.Item2);
             }
 
             if (update.Message != null)
             {
-                var replyToUser = _messageHandler.HandleMessage(update.Message);
+                var replyToUser = await _messageHandler.HandleMessage(update.Message);
                 await SendReplyAsync(replyToUser.Item1, replyToUser.Item2);
             }
         }

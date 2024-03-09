@@ -9,11 +9,11 @@ internal class AddOrderHandler(IUserInputPipelineBuilder userInputPipelineBuilde
 {
     public Triggers Trigger => Triggers.AddOrder;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         userInputPipelineBuilder.BuildAddOrderPipeline();
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             @"Enter Order Info:
             Ticker - 'SILVER'
             Direction - BUY/SELL
@@ -27,6 +27,6 @@ internal class AddOrderHandler(IUserInputPipelineBuilder userInputPipelineBuilde
                     {
                         InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                     }
-                }));
+                })));
     }
 }

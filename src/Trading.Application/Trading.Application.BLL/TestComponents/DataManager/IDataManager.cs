@@ -4,5 +4,5 @@ namespace Trading.Application.BLL;
 
 public interface IDataManager
 {
-    Task DownloadAndSavePrices(string epic, Timeframe timeframe);
+    Task DownloadAndSavePricesAsync(Timeframe timeframe);
 }

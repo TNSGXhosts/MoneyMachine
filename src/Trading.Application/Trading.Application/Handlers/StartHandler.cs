@@ -8,14 +8,14 @@ internal class StartHandler : IHandler
 {
     public Triggers Trigger => Triggers.Start;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         if (!userInput.Equals(nameof(Trigger.Start)))
         {
-            return new Tuple<string, InlineKeyboardMarkup>(string.Empty, null);
+            return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(string.Empty, null));
         }
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             "Choose an action:",
             new InlineKeyboardMarkup(new []
             {
@@ -28,6 +28,6 @@ internal class StartHandler : IHandler
                     InlineKeyboardButton.WithCallbackData("Test Strategy:", nameof(Triggers.TestStrategy))
                 }
             })
-        );
+        ));
     }
 }

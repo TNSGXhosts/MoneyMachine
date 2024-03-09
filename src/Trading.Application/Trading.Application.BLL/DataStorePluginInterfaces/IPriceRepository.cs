@@ -15,4 +15,6 @@ public interface IPriceRepository
         Period period);
 
     Task SavePriceBatchAsync(PriceBatch batch);
+
+    Task<bool> IsBatchExistsAsync(string ticker, Timeframe timeframe, Period period);
 }

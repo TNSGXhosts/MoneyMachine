@@ -5,5 +5,5 @@ namespace Trading.Application.TelegramIntegration;
 
 public interface ICallbackHandler
 {
-    Tuple<string, InlineKeyboardMarkup> HandleCallback(CallbackQuery callbackQuery);
+    Task<Tuple<string, InlineKeyboardMarkup>> HandleCallback(CallbackQuery callbackQuery);
 }

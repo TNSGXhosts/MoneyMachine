@@ -11,7 +11,7 @@ internal class ChooseOrderHandler(IOrderClient orderClient, IUserContext userCon
 {
     public Triggers Trigger => Triggers.ChooseOrder;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         var orders = orderClient.GetOrdersAsync();
         var keyboardButtons = orders.Result
@@ -32,8 +32,8 @@ internal class ChooseOrderHandler(IOrderClient orderClient, IUserContext userCon
         buttonLines.Add(new List<InlineKeyboardButton>() { InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)) });
         var keyboardMarkup = new InlineKeyboardMarkup(buttonLines);
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             "Choose an order:",
-            keyboardMarkup);
+            keyboardMarkup));
     }
 }

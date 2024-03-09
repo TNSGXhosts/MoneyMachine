@@ -5,5 +5,5 @@ namespace Trading.Application.TelegramIntegration;
 
 public interface IMessageHandler
 {
-    Tuple<string, InlineKeyboardMarkup> HandleMessage(Message message);
+    Task<Tuple<string, InlineKeyboardMarkup>> HandleMessage(Message message);
 }

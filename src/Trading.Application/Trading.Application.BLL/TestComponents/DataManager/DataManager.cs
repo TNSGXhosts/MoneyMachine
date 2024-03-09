@@ -7,28 +7,30 @@ namespace Trading.Application.BLL;
 
 public class DataManager(IPriceRepository priceRepository, IPricesClient pricesClient) : IDataManager
 {
-    public async Task DownloadAndSavePrices(string epic, Timeframe timeframe)
+    public async Task DownloadAndSavePricesAsync(Timeframe timeframe)
     {
         const Period period = Period.YEAR;
-        var dbPrices = await priceRepository.GetPricesAsync(epic, timeframe, period);
 
-        if (!dbPrices.Any())
+        foreach (var epic in StrategyConstants.Coins)
         {
-            await UpdatePrices(epic, timeframe, period);
+            var isExists = await priceRepository.IsBatchExistsAsync(epic, timeframe, period);
+
+            if (!isExists)
+            {
+                await DownloadPricesAsync(epic, timeframe, period);
+            }
         }
     }
 
-    private async Task UpdatePrices(string epic, Timeframe timeframe, Period period)
+    private async Task DownloadPricesAsync(string epic, Timeframe timeframe, Period period)
     {
-        var toDate = DateTime.UtcNow.Date.AddDays(-1);
-        var fromDate = toDate.AddMonths(-12);
+        var periodDates = period.GetPeriod();
 
         var newPrices = new List<PriceEntity>(await pricesClient.GetHistoricalPrices(
             epic,
             timeframe,
             CapitalIntegrationConstants.MaxPricesToDownload,
-            fromDate,
-            toDate
+            periodDates.Item1
         ));
 
         var lastPrice = newPrices.LastOrDefault()?.SnapshotTime;
@@ -37,14 +39,13 @@ public class DataManager(IPriceRepository priceRepository, IPricesClient pricesC
             throw new Exception("Cannot download prices");
         }
 
-        while (lastPrice < toDate)
+        while (lastPrice < periodDates.Item2)
         {
-            newPrices.Concat(await pricesClient.GetHistoricalPrices(
+            newPrices.AddRange(await pricesClient.GetHistoricalPrices(
                 epic,
                 timeframe,
                 CapitalIntegrationConstants.MaxPricesToDownload,
-                lastPrice.Value.IncreaseDateByTimeframe(timeframe),
-                toDate
+                lastPrice.Value.IncreaseDateByTimeframe(timeframe)
             ));
 
             lastPrice = newPrices.LastOrDefault()?.SnapshotTime;
@@ -56,8 +57,8 @@ public class DataManager(IPriceRepository priceRepository, IPricesClient pricesC
             TimeFrame = timeframe.ToString(),
             Period = period.ToString(),
             Prices = new List<PriceEntity>(newPrices),
-            StartDate = fromDate,
-            EndDate = toDate
+            StartDate = periodDates.Item1,
+            EndDate = periodDates.Item2
         };
 
         await priceRepository.SavePriceBatchAsync(newPriceBatch);

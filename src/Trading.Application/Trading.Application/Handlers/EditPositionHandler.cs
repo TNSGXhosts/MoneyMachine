@@ -12,11 +12,11 @@ internal class EditPositionHandler(
 {
     public Triggers Trigger => Triggers.EditPosition;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         userInputPipelineBuilder.BuildEditPositionPipeline();
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             GetMessage(),
             new InlineKeyboardMarkup(new []
             {
@@ -24,7 +24,7 @@ internal class EditPositionHandler(
                 {
                     InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                 }
-            }));
+            })));
     }
 
     private string GetMessage()

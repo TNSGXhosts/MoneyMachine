@@ -9,11 +9,11 @@ internal class AddPositionHandler(IUserInputPipelineBuilder userInputPipelineBui
 {
     public Triggers Trigger => Triggers.AddPosition;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         userInputPipelineBuilder.BuildAddPositionPipeline();
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             @"Enter Position Info:
             Ticker - 'SILVER'
             Direction - BUY/SELL
@@ -26,6 +26,6 @@ internal class AddPositionHandler(IUserInputPipelineBuilder userInputPipelineBui
                     {
                         InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                     }
-                }));
+                })));
     }
 }

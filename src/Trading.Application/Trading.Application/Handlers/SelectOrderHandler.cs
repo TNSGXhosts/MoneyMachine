@@ -11,13 +11,13 @@ internal class SelectOrderHandler(IUserContext userContext, IOrderClient orderCl
 {
     public Triggers Trigger => Triggers.SelectOrder;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         userContext.InputCallback = userInput;
 
         userContext.WorkingOrder = orderClient.GetOrdersAsync().Result.First(o => o.WorkingOrderData.DealId == userInput);
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             "Choose an action:",
             new InlineKeyboardMarkup(new []
             {
@@ -27,6 +27,6 @@ internal class SelectOrderHandler(IUserContext userContext, IOrderClient orderCl
                     InlineKeyboardButton.WithCallbackData("Close Order", nameof(Triggers.CloseOrder)),
                     InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)),
                 }
-            }));
+            })));
     }
 }

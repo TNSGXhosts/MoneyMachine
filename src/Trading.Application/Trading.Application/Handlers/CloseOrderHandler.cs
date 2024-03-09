@@ -10,13 +10,13 @@ public class CloseOrderHandler(IOrderClient orderClient, IUserContext userContex
 {
     Triggers IHandler.Trigger => Triggers.CloseOrder;
 
-    public Tuple<string, InlineKeyboardMarkup> Handle(string userInput)
+    public Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput)
     {
         var isSuccess = orderClient.CloseOrderAsync(userContext.InputCallback).Result;
         userContext.InputCallback = string.Empty;
 
-        return new Tuple<string, InlineKeyboardMarkup>(
+        return Task.FromResult(new Tuple<string, InlineKeyboardMarkup>(
             isSuccess ? "Operation have processed successfully" : "Operation Failed",
-            new InlineKeyboardMarkup(new [] { new [] { InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)) } }));
+            new InlineKeyboardMarkup(new [] { new [] { InlineKeyboardButton.WithCallbackData("Go back", nameof(Triggers.Start)) } })));
     }
 }

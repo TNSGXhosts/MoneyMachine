@@ -16,7 +16,7 @@ public class CallbackHandler(ILogger<CallbackHandler> logger,
                             ICallbackParser callbackParser,
                             IStateProcessor stateProcessor) : ICallbackHandler
 {
-    public Tuple<string, InlineKeyboardMarkup> HandleCallback(CallbackQuery callbackQuery)
+    public async Task<Tuple<string, InlineKeyboardMarkup>> HandleCallback(CallbackQuery callbackQuery)
     {
         Tuple<string, InlineKeyboardMarkup>? reply = new Tuple<string, InlineKeyboardMarkup>(string.Empty, null);
         try
@@ -29,7 +29,11 @@ public class CallbackHandler(ILogger<CallbackHandler> logger,
                 logger.LogInformation($"Parsed trigger: {parsedData.Item1}, new state: {stateProcessor.State}");
 
                 var handler = handlers.FirstOrDefault(h => h.Trigger == parsedData.Item1);
-                reply = handler?.Handle(string.IsNullOrEmpty(parsedData.Item2) ? parsedData.Item1.ToString() : parsedData.Item2);
+                if (handler != null)
+                {
+                    reply = await handler?.HandleAsync(
+                        string.IsNullOrEmpty(parsedData.Item2) ? parsedData.Item1.ToString() : parsedData.Item2);
+                }
             }
             else if (stateProcessor.State != States.Start)
             {

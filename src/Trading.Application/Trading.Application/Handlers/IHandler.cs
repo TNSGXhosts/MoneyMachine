@@ -8,5 +8,5 @@ public interface IHandler
 {
     Triggers Trigger { get; }
 
-    Tuple<string, InlineKeyboardMarkup>Handle(string userInput);
+    Task<Tuple<string, InlineKeyboardMarkup>> HandleAsync(string userInput);
 }
