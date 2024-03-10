@@ -1,9 +1,12 @@
-﻿namespace Trading.Application.BLL;
+﻿using Skender.Stock.Indicators;
+
+namespace Trading.Application.BLL;
 
 public class SimpleStrategy(IStrategyContext strategyContext) : IStrategy
 {
     public bool IsOpenPositionSignal(
         string epic,
+        out Quote openPrice,
         DateTime dateTime = default)
     {
         dateTime = GetCurrentStrategyDate(dateTime);
@@ -15,6 +18,11 @@ public class SimpleStrategy(IStrategyContext strategyContext) : IStrategy
         var previousSma20 = strategyContext.GetSma20(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe));
         var askClosePrice = strategyContext.GetAskPrice(epic, dateTime).Close;
         var previousAskClosePrice = strategyContext.GetAskPrice(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe)).Close;
+
+        var isSignal = IsSma50AbovePrice(sma50, btcAskClosePrice)
+            && IsPriceCrossUpSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice);
+
+        openPrice = !isSignal ? new Quote() : strategyContext.GetAskPrice(epic, dateTime);
 
         return IsSma50AbovePrice(sma50, btcAskClosePrice)
             && IsPriceCrossUpSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice);

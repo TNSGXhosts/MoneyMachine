@@ -1,4 +1,6 @@
-﻿namespace Trading.Application.BLL;
+﻿using Skender.Stock.Indicators;
+
+namespace Trading.Application.BLL;
 
 public class PatternStrategy(IStrategyContext strategyContext) : IStrategy
 {
@@ -7,7 +9,7 @@ public class PatternStrategy(IStrategyContext strategyContext) : IStrategy
         throw new NotImplementedException();
     }
 
-    public bool IsOpenPositionSignal(string epic, DateTime dateTime = default)
+    public bool IsOpenPositionSignal(string epic, out Quote openPrice, DateTime dateTime = default)
     {
         throw new NotImplementedException();
     }

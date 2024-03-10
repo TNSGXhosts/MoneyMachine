@@ -90,9 +90,9 @@ public class TestProcessor(IStrategy strategy, IStrategyContext strategyContext)
         var epicsWithSignals = new Dictionary<string, Quote>();
         foreach(var epic in epics)
         {
-            if (strategy.IsOpenPositionSignal(epic, dateTime) && _openPositionPrices.Count < 10)
+            if (strategy.IsOpenPositionSignal(epic, out var openPrice, dateTime) && _openPositionPrices.Count < 10)
             {
-                epicsWithSignals.Add(epic, strategyContext.GetAskPrice(epic, dateTime));
+                epicsWithSignals.Add(epic, openPrice);
             }
         }
 
