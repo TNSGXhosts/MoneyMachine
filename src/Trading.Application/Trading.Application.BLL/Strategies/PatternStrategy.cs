@@ -2,18 +2,12 @@
 
 public class PatternStrategy(IStrategyContext strategyContext) : IStrategy
 {
-    public bool IsClosePositionSignal(decimal sma20, decimal previousSma20, decimal askClosePrice, decimal previousAskClosePrice)
+    public bool IsClosePositionSignal(string epic, DateTime dateTime = default)
     {
         throw new NotImplementedException();
     }
 
-    public bool IsOpenPositionSignal(
-        decimal sma20,
-        decimal previousSma20,
-        decimal askClosePrice,
-        decimal previousAskClosePrice,
-        decimal sma50,
-        decimal btcAskClosePrice)
+    public bool IsOpenPositionSignal(string epic, DateTime dateTime = default)
     {
         throw new NotImplementedException();
     }

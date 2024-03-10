@@ -1,26 +1,36 @@
 ﻿namespace Trading.Application.BLL;
 
-public class SimpleStrategy : IStrategy
+public class SimpleStrategy(IStrategyContext strategyContext) : IStrategy
 {
     public bool IsOpenPositionSignal(
-        decimal sma20,
-        decimal previousSma20,
-        decimal askClosePrice,
-        decimal previousAskClosePrice,
-        decimal sma50,
-        decimal btcAskClosePrice
-    )
+        string epic,
+        DateTime dateTime = default)
     {
+        dateTime = GetCurrentStrategyDate(dateTime);
+
+        var sma50 = strategyContext.GetSma50(StrategyConstants.BTCUSD, dateTime);
+        var btcAskClosePrice = strategyContext.GetAskPrice(StrategyConstants.BTCUSD, dateTime).Close;
+
+        var sma20 = strategyContext.GetSma20(epic, dateTime);
+        var previousSma20 = strategyContext.GetSma20(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe));
+        var askClosePrice = strategyContext.GetAskPrice(epic, dateTime).Close;
+        var previousAskClosePrice = strategyContext.GetAskPrice(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe)).Close;
+
         return IsSma50AbovePrice(sma50, btcAskClosePrice)
             && IsPriceCrossUpSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice);
     }
 
     public bool IsClosePositionSignal(
-        decimal sma20,
-        decimal previousSma20,
-        decimal askClosePrice,
-        decimal previousAskClosePrice)
+        string epic,
+        DateTime dateTime = default)
     {
+        dateTime = GetCurrentStrategyDate(dateTime);
+
+        var sma20 = strategyContext.GetSma20(epic, dateTime);
+        var previousSma20 = strategyContext.GetSma20(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe));
+        var askClosePrice = strategyContext.GetAskPrice(epic, dateTime).Close;
+        var previousAskClosePrice = strategyContext.GetAskPrice(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe)).Close;
+
         return IsPriceCrossDownSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice);
     }
 
@@ -45,5 +55,10 @@ public class SimpleStrategy : IStrategy
         decimal previousAskClosePrice)
     {
         return sma20 > askClosePrice && previousSma20 < previousAskClosePrice;
+    }
+
+    private DateTime GetCurrentStrategyDate(DateTime defaultDate)
+    {
+        return defaultDate == default ? strategyContext[StrategyConstants.BTCUSD].Last().Value.AskPrice.Date : defaultDate;
     }
 }

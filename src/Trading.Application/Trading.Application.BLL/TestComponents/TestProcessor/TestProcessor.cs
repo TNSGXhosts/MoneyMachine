@@ -65,11 +65,7 @@ public class TestProcessor(IStrategy strategy, IStrategyContext strategyContext)
         var newPositionList = new List<OpenTestPosition>();
         foreach(var price in _openPositionPrices)
         {
-            if (strategy.IsClosePositionSignal(
-                strategyContext.GetSma20(price.Epic, dateTime),
-                strategyContext.GetSma20(price.Epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe)),
-                strategyContext.GetAskPrice(price.Epic, dateTime).Close,
-                strategyContext.GetAskPrice(price.Epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe)).Close))
+            if (strategy.IsClosePositionSignal(price.Epic, dateTime))
             {
                 ClosePosition(dateTime, price.Epic, price.OpenPrice, price.OpenVolume);
             } else {
@@ -94,14 +90,7 @@ public class TestProcessor(IStrategy strategy, IStrategyContext strategyContext)
         var epicsWithSignals = new Dictionary<string, Quote>();
         foreach(var epic in epics)
         {
-            if (strategy.IsOpenPositionSignal(
-                strategyContext.GetSma20(epic, dateTime),
-                strategyContext.GetSma20(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe)),
-                strategyContext.GetAskPrice(epic, dateTime).Close,
-                strategyContext.GetAskPrice(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe)).Close,
-                strategyContext.GetSma50(StrategyConstants.BTCUSD, dateTime),
-                strategyContext.GetAskPrice(StrategyConstants.BTCUSD, dateTime).Close
-                ) && _openPositionPrices.Count < 10)
+            if (strategy.IsOpenPositionSignal(epic, dateTime) && _openPositionPrices.Count < 10)
             {
                 epicsWithSignals.Add(epic, strategyContext.GetAskPrice(epic, dateTime));
             }

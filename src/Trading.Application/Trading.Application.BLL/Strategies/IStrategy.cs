@@ -3,17 +3,10 @@
 public interface IStrategy
 {
     bool IsOpenPositionSignal(
-        decimal sma20,
-        decimal previousSma20,
-        decimal askClosePrice,
-        decimal previousAskClosePrice,
-        decimal sma50,
-        decimal btcAskClosePrice
-    );
+        string epic,
+        DateTime dateTime = default);
 
     bool IsClosePositionSignal(
-        decimal sma20,
-        decimal previousSma20,
-        decimal askClosePrice,
-        decimal previousAskClosePrice);
+        string epic,
+        DateTime dateTime = default);
 }
