@@ -13,19 +13,14 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Trading.Application.TelegramIntegration;
 
-// TODO : Refactor this class
-
 internal class TelegramClient(
     ILogger<TelegramClient> logger,
     IOptions<TelegramSettings> options,
-    IMessageHandler messageHandler,
-    ICallbackHandler callbackHandler,
-    ITelegramContext telegramContext) : ITelegramClient
+    ITelegramContext telegramContext,
+    IHandlerFactory handlerFactory) : ITelegramClient
 {
     private readonly ILogger<TelegramClient> _logger = logger;
     private readonly TelegramSettings _telegramSettings = options.Value;
-    private readonly IMessageHandler _messageHandler = messageHandler;
-    private readonly ICallbackHandler _callbackHandler = callbackHandler;
     private readonly ITelegramContext _telegramContext = telegramContext;
 
     private TelegramBotClient? _botClient;
@@ -61,13 +56,15 @@ internal class TelegramClient(
         {
             if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery != null)
             {
-                var replyToUser = await _callbackHandler.HandleCallback(update.CallbackQuery);
+                var callbackHandler = handlerFactory.GetCallbackHandler();
+                var replyToUser = await callbackHandler.HandleCallback(update.CallbackQuery);
                 await SendReplyAsync(replyToUser.Item1, replyToUser.Item2);
             }
 
             if (update.Message != null)
             {
-                var replyToUser = await _messageHandler.HandleMessage(update.Message);
+                var messageHandler = handlerFactory.GetMessageHandler();
+                var replyToUser = await messageHandler.HandleMessage(update.Message);
                 await SendReplyAsync(replyToUser.Item1, replyToUser.Item2);
             }
         }
