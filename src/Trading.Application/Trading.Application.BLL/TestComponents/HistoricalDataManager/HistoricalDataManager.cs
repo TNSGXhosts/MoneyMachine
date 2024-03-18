@@ -5,11 +5,11 @@ using Trading.Application.BLL.CapitalIntegration;
 
 namespace Trading.Application.BLL;
 
-public class DataManager(IPriceRepository priceRepository, IPricesClient pricesClient) : IDataManager
+public class HistoricalDataManager(IPriceRepository priceRepository, IPricesClient pricesClient) : IHistoricalDataManager
 {
     public async Task DownloadAndSavePricesAsync(Timeframe timeframe)
     {
-        const Period period = Period.YEAR_5;
+        var period = StrategyConstants.DefaultPeriod;
 
         foreach (var epic in StrategyConstants.Coins)
         {

@@ -2,5 +2,5 @@
 
 public interface ITestProcessor
 {
-    Task<string> Run();
+    string Run();
 }

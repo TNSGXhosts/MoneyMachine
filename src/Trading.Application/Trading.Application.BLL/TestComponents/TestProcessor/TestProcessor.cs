@@ -1,22 +1,36 @@
 ﻿using Core;
 
-using Skender.Stock.Indicators;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Trading.Application.BLL;
 
-public class TestProcessor(IStrategy strategy, IStrategyContext strategyContext) : ITestProcessor
+public class TestProcessor(
+    IStrategyContext strategyContext,
+    IReportGenerator reportGenerator,
+    IServiceProvider serviceProvider,
+    ICoinsSeeker coinsSeeker) : ITestProcessor
 {
     private decimal _balance = StrategyConstants.StartBalance;
+    private readonly Dictionary<string, (decimal, IList<OpenTestPosition>)> _strategiesData = new();
 
-    private readonly decimal _percentOfBalanceForTrade = 0.1m;
-    private IList<OpenTestPosition> _openPositionPrices = new List<OpenTestPosition>();
+    private readonly decimal _percentOfBalanceForTrade = 0.2m;
+    private readonly int _maxOpenPositions = 5;
 
-    public async Task<string> Run()
+    public string Run()
     {
         _balance = StrategyConstants.StartBalance;
-        _openPositionPrices = new List<OpenTestPosition>();
+
+        using (var scope = serviceProvider.CreateScope())
+        {
+            var strategies = scope.ServiceProvider.GetServices<IStrategy>();
+            foreach (var strategy in strategies)
+            {
+                _strategiesData.Add(strategy.GetType().Name, (_balance / strategies.Count(), new List<OpenTestPosition>()));
+            }
+        }
 
         Test();
+        reportGenerator.ExportToExcel();
 
         return $"Test result: {_balance}";
     }
@@ -33,78 +47,116 @@ public class TestProcessor(IStrategy strategy, IStrategyContext strategyContext)
         }
     }
 
-    public IEnumerable<string> ChooseCoinsToTrade(DateTime dateTime)
-    {
-        var priceChanges = new Dictionary<string, decimal>();
-
-        foreach(var epicData in strategyContext)
-        {
-            priceChanges.Add(
-                epicData.Key,
-                CalculatePercentageChange(
-                    epicData.Value.GetAskPrice(dateTime.GetPreviousDate(StrategyConstants.Timeframe)).Close,
-                    epicData.Value.GetAskPrice(dateTime).Close));
-        }
-
-        var sortedPriceChanges = priceChanges.OrderByDescending(d => d.Value);
-        return sortedPriceChanges.Take(5).Select(d => d.Key);
-    }
-
-    private decimal CalculatePercentageChange(decimal oldPrice, decimal newPrice)
-    {
-        if (oldPrice == 0)
-        {
-            return 0;
-        }
-
-        return ((newPrice - oldPrice) / oldPrice) * 100;
-    }
-
     public void ClosePositionsIfNecessary(DateTime dateTime)
     {
-        var newPositionList = new List<OpenTestPosition>();
-        foreach(var price in _openPositionPrices)
+        //var newPositionList = new List<OpenTestPosition>();
+
+        using (var scope = serviceProvider.CreateScope())
         {
-            if (strategy.IsClosePositionSignal(price.Epic, dateTime))
+            var strategies = scope.ServiceProvider.GetServices<IStrategy>();
+
+            //TODO: fix the same balance for all strategies
+            foreach (var strategy in strategies)
             {
-                ClosePosition(dateTime, price.Epic, price.OpenPrice, price.OpenVolume);
-            } else {
-                newPositionList.Add(price);
+                var strategyName = strategy.GetType().Name;
+                foreach(var price in _strategiesData[strategyName].Item2.ToList())
+                {
+                    if (strategy.IsClosePositionSignal(price.Epic, price.OpenDate, out var closePrice, dateTime))
+                    {
+                        ClosePosition(dateTime, price.Epic, price.OpenPrice, closePrice, price.OpenVolume, strategy);
+                        _strategiesData[strategyName].Item2.Remove(price);
+                    }
+                    // else {
+                    //     newPositionList.Add(price);
+                    // }
+                }
+                //_strategiesData[strategyName].Item2 = newPositionList;
             }
         }
-
-        _openPositionPrices = newPositionList;
     }
 
-    private void ClosePosition(DateTime dateTime, string epic, decimal openPrice, decimal openVolume)
+    private void ClosePosition(
+        DateTime dateTime,
+        string epic,
+        decimal openPrice,
+        decimal closePrice,
+        decimal openVolume,
+        IStrategy strategy)
     {
-        var priceChangePercentage = ((strategyContext.GetBidPrice(epic, dateTime).Close - openPrice) / openPrice) * 100;
+        if (openPrice != 0)
+        {
+            var strategyName = strategy.GetType().Name;
 
-        _balance += (openVolume * (100 + priceChangePercentage) / 100) - openVolume;
+            var priceChangePercentage = ((closePrice - openPrice) / openPrice) * 100;
+
+            var tradeResult = (openVolume * (100 + priceChangePercentage) / 100) - openVolume;
+            if (strategy.StrategyType == StrategyType.Short)
+            {
+                tradeResult = -tradeResult;
+            }
+
+            var currentStrategyBalance = _strategiesData[strategyName].Item1;
+            currentStrategyBalance += tradeResult;
+
+            _balance += tradeResult;
+
+            _strategiesData[strategyName] = (currentStrategyBalance, _strategiesData[strategyName].Item2);
+
+            reportGenerator.ProceedTrade(
+                priceChangePercentage,
+                dateTime,
+                epic,
+                strategyName,
+                openPrice,
+                closePrice,
+                _balance);
+        }
     }
 
     public void OpenPositionIfSignal(DateTime dateTime)
     {
-        var epics = ChooseCoinsToTrade(dateTime);
+        var epics = coinsSeeker.ChooseCoinsToTrade(dateTime);
 
-        var epicsWithSignals = new Dictionary<string, Quote>();
-        foreach(var epic in epics)
+        // var epicsWithSignals = new Dictionary<string, decimal>();
+
+        using (var scope = serviceProvider.CreateScope())
         {
-            if (strategy.IsOpenPositionSignal(epic, out var openPrice, dateTime) && _openPositionPrices.Count < 10)
+            var strategies = scope.ServiceProvider.GetServices<IStrategy>();
+
+            foreach(var strategy in strategies)
             {
-                epicsWithSignals.Add(epic, openPrice);
+                var strategyName = strategy.GetType().Name;
+                foreach(var epic in epics)
+                {
+                    if (strategy.IsOpenPositionSignal(epic, out var openPrice, dateTime)
+                        && _strategiesData[strategyName].Item2.Count < _maxOpenPositions)
+                    {
+                        _strategiesData[strategyName].Item2.Add(new OpenTestPosition
+                        {
+                            Epic = epic,
+                            OpenPrice = openPrice,
+                            OpenVolume = _strategiesData[strategyName].Item1 * _percentOfBalanceForTrade,
+                            OpenDate = dateTime
+                        });
+                    }
+                }
             }
         }
 
-        if (epicsWithSignals.Count > 0)
-        {
-            var epicToTrade = epicsWithSignals.OrderByDescending(e => e.Value.Volume).First();
-            _openPositionPrices.Add(new OpenTestPosition
-            {
-                Epic = epicToTrade.Key,
-                OpenPrice = epicToTrade.Value.Close,
-                OpenVolume = _balance * _percentOfBalanceForTrade
-            });
-        }
+        // if (epicsWithSignals.Count > 0)
+        // {
+        //     //TODO: determinate if we need filter signals by Trade Volume
+        //     //var epicToTrade = epicsWithSignals.OrderByDescending(e => e.Value.Volume).First();
+        //     foreach(var signal in epicsWithSignals)
+        //     {
+        //         _openPositionPrices.Add(new OpenTestPosition
+        //         {
+        //             Epic = signal.Key,
+        //             OpenPrice = signal.Value,
+        //             OpenVolume = _balance * _percentOfBalanceForTrade,
+        //             OpenDate = dateTime
+        //         });
+        //     }
+        // }
     }
 }

@@ -24,8 +24,6 @@ public static class PresentationRegistry
         services.AddSingleton<IStateProcessor, StateProcessor>();
         services.AddSingleton<IUserContext, UserContext.UserContext>();
 
-        services.AddScoped<IHandlerFactory, HandlerFactory>();
-
         services.AddScoped<IMessageHandler, MessageHandler>();
         services.AddScoped<ICallbackHandler, CallbackHandler>();
         services.AddScoped<ICallbackParser, CallbackParser>();

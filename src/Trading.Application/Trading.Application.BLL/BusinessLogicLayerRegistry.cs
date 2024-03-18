@@ -33,16 +33,32 @@ public static class BusinessLogicLayerRegistry
         services.AddScoped<IOrderClient, OrderClient>();
         services.AddScoped<IPositionClient, PositionClient>();
         services.AddScoped<IPricesClient, PricesClient>();
+        services.AddScoped<IMarketClient, MarketClient>();
 
-        services.AddScoped<IDataManager, DataManager>();
+        services.AddScoped<IHistoricalDataManager, HistoricalDataManager>();
         services.AddScoped<ITestProcessor, TestProcessor>();
-        services.AddScoped<IStrategy, SimpleStrategy>();
-        services.AddScoped<IStrategyContext, StrategyContext>();
+        services.AddSingleton<IStrategyContext, StrategyContext>();
+        services.AddScoped<IReportGenerator, ReportGenerator>();
+        services.AddScoped<ICoinsSeeker, CoinsSeeker>();
+
+        RegisterStrategies(services);
+    }
+
+    private static void RegisterStrategies(IServiceCollection services)
+    {
+        services.AddScoped<IStrategy, PatternLongStrategy>();
+        services.AddScoped<IStrategy, PatternShortStrategy>();
+        services.AddScoped<IStrategy, PinBarLongStrategy>();
+        services.AddScoped<IStrategy, PinBarShortStrategy>();
+        services.AddScoped<IStrategy, ThreeBarsLongStrategy>();
+        services.AddScoped<IStrategy, ThreeBarsShortStrategy>();
     }
 
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<CapitalIntegrationSettings>(settings => configuration.GetSection(nameof(CapitalIntegrationSettings))
+            .Bind(settings));
+        services.Configure<ReportGeneratorSettings>(settings => configuration.GetSection(nameof(ReportGeneratorSettings))
             .Bind(settings));
     }
 

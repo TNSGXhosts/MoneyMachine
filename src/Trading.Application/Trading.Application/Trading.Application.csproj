@@ -44,8 +44,4 @@
       <ProjectReference Include="..\Plugins\Trading.Application.DAL\Trading.Application.DAL.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="TelegramIntegration/HandlersFactories/" />
-    </ItemGroup>
-
 </Project>

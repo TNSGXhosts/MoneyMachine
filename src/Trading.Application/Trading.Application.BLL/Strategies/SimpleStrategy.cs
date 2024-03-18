@@ -1,12 +1,10 @@
-﻿using Skender.Stock.Indicators;
+﻿namespace Trading.Application.BLL;
 
-namespace Trading.Application.BLL;
-
-public class SimpleStrategy(IStrategyContext strategyContext) : IStrategy
+public class SimpleStrategy(IStrategyContext strategyContext)
 {
     public bool IsOpenPositionSignal(
         string epic,
-        out Quote openPrice,
+        out decimal openPrice,
         DateTime dateTime = default)
     {
         dateTime = GetCurrentStrategyDate(dateTime);
@@ -22,7 +20,7 @@ public class SimpleStrategy(IStrategyContext strategyContext) : IStrategy
         var isSignal = IsSma50AbovePrice(sma50, btcAskClosePrice)
             && IsPriceCrossUpSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice);
 
-        openPrice = !isSignal ? new Quote() : strategyContext.GetAskPrice(epic, dateTime);
+        openPrice = !isSignal ? default : strategyContext.GetBidPrice(epic, dateTime).Close;
 
         return IsSma50AbovePrice(sma50, btcAskClosePrice)
             && IsPriceCrossUpSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice);
@@ -30,6 +28,8 @@ public class SimpleStrategy(IStrategyContext strategyContext) : IStrategy
 
     public bool IsClosePositionSignal(
         string epic,
+        //DateTime openPositionDate,
+        out decimal closePrice,
         DateTime dateTime = default)
     {
         dateTime = GetCurrentStrategyDate(dateTime);
@@ -39,7 +39,14 @@ public class SimpleStrategy(IStrategyContext strategyContext) : IStrategy
         var askClosePrice = strategyContext.GetAskPrice(epic, dateTime).Close;
         var previousAskClosePrice = strategyContext.GetAskPrice(epic, dateTime.GetPreviousDate(StrategyConstants.Timeframe)).Close;
 
-        return IsPriceCrossDownSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice);
+        if (IsPriceCrossDownSma20(sma20, previousSma20, askClosePrice, previousAskClosePrice))
+        {
+            closePrice = askClosePrice;
+            return true;
+        }
+
+        closePrice = default;
+        return false;
     }
 
     private bool IsSma50AbovePrice(decimal sma50, decimal askClosePrice)
