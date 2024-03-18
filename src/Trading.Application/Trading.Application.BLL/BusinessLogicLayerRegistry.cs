@@ -46,12 +46,13 @@ public static class BusinessLogicLayerRegistry
 
     private static void RegisterStrategies(IServiceCollection services)
     {
-        services.AddScoped<IStrategy, PatternLongStrategy>();
-        services.AddScoped<IStrategy, PatternShortStrategy>();
-        services.AddScoped<IStrategy, PinBarLongStrategy>();
-        services.AddScoped<IStrategy, PinBarShortStrategy>();
-        services.AddScoped<IStrategy, ThreeBarsLongStrategy>();
-        services.AddScoped<IStrategy, ThreeBarsShortStrategy>();
+        services.AddScoped<IStrategy, SimpleStrategy>();
+        // services.AddScoped<IStrategy, PatternLongStrategy>();
+        // services.AddScoped<IStrategy, PatternShortStrategy>();
+        // services.AddScoped<IStrategy, PinBarLongStrategy>();
+        // services.AddScoped<IStrategy, PinBarShortStrategy>();
+        // services.AddScoped<IStrategy, ThreeBarsLongStrategy>();
+        // services.AddScoped<IStrategy, ThreeBarsShortStrategy>();
     }
 
     private static void ConfigurationRegistry(IServiceCollection services, IConfiguration configuration)

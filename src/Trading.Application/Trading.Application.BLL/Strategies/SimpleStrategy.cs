@@ -1,7 +1,11 @@
-﻿namespace Trading.Application.BLL;
+﻿using Core;
 
-public class SimpleStrategy(IStrategyContext strategyContext)
+namespace Trading.Application.BLL;
+
+public class SimpleStrategy(IStrategyContext strategyContext) : IStrategy
 {
+    public StrategyType StrategyType => StrategyType.Long;
+
     public bool IsOpenPositionSignal(
         string epic,
         out decimal openPrice,
@@ -28,7 +32,7 @@ public class SimpleStrategy(IStrategyContext strategyContext)
 
     public bool IsClosePositionSignal(
         string epic,
-        //DateTime openPositionDate,
+        DateTime openPositionDate,
         out decimal closePrice,
         DateTime dateTime = default)
     {
